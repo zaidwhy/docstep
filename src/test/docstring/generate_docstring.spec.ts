@@ -148,6 +148,15 @@ describe("DocstringFactory", () => {
             expect(result).to.equal('"""abc\n\nabc\n"""');
         });
 
+        it("should condense CRLF newlines from a template with Windows line endings", () => {
+            const template = "Summary\r\n\r\n\r\nArgs\r\n\r\n";
+            const factory = new DocstringFactory(template);
+
+            const result = factory.generateDocstring(defaultDocstringComponents);
+
+            expect(result).to.equal('"""Summary\n\nArgs\n"""');
+        });
+
         context("when guessTypes is set to false", () => {
             it("should not use the types from the docstring", () => {
                 const docstringComponents = defaultDocstringComponents;
