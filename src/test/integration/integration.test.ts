@@ -1,4 +1,4 @@
-import chai = require("chai");
+import * as chai from "chai";
 import fs = require("fs");
 import "mocha";
 import * as path from "path";

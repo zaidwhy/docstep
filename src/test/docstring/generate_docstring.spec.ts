@@ -1,4 +1,4 @@
-import chai = require("chai");
+import * as chai from "chai";
 import "mocha";
 import { DocstringFactory } from "../../docstring/docstring_factory";
 import { DocstringParts } from "../../docstring_parts";

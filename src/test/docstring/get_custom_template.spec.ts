@@ -1,4 +1,4 @@
-import chai = require("chai");
+import * as chai from "chai";
 import "mocha";
 
 import { getCustomTemplate } from "../../docstring/get_template";
