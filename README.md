@@ -1,20 +1,28 @@
-[![Installs](https://vsmarketplacebadges.dev/installs-short/njpwerner.autodocstring.svg)](https://marketplace.visualstudio.com/items?itemName=njpwerner.autodocstring)
-[![Rating](https://vsmarketplacebadges.dev/rating-short/njpwerner.autodocstring.svg)](https://marketplace.visualstudio.com/items?itemName=njpwerner.autodocstring&ssr=false#review-details)
-[![Build Status](https://github.com/NilsJPWerner/autoDocstring/actions/workflows/test_and_publish.yml/badge.svg)](https://github.com/NilsJPWerner/autoDocstring/actions/workflows/test_and_publish.yml)
-[![Github Sponsorship](https://img.shields.io/badge/sponsor-5A5A5A?style=flat&logo=GitHub-Sponsors)](https://github.com/sponsors/NilsJPWerner)
+# Docstep
 
-# autoDocstring: VSCode Python Docstring Generator
+Docstep is a VS Code extension that generates Python docstrings from a function or class signature, in Google, NumPy, Sphinx, PEP 257, docBlockr, doxygen or a custom mustache template. It is a maintained fork of [autoDocstring](https://github.com/NilsJPWerner/autoDocstring) by Nils Werner, whose last release was 0.6.1 in February 2022. On top of upstream it fixes docstrings indented to the editor tab size instead of the function body ([#315](https://github.com/NilsJPWerner/autoDocstring/issues/315)), the ignored `generateDocstringOnEnter` setting ([#312](https://github.com/NilsJPWerner/autoDocstring/issues/312)), CRLF templates, and functions and classes with PEP 695 type parameters. The full list is in the [CHANGELOG](CHANGELOG.md).
 
-Visual Studio Code extension to quickly generate docstrings for python functions.
+![Generating a docstring](images/demo.gif)
 
-![Auto Generate Docstrings](images/demo.gif)
+## Install
 
-## Features
+Docstep is not on the VS Code Marketplace or Open VSX yet. Build and install it from source:
 
--   Quickly generate a docstring snippet that can be tabbed through.
--   Choose between several different types of docstring formats.
--   Infers parameter types through pep484 type hints, default values, and var names.
--   Support for args, kwargs, decorators, errors, and parameter types
+```bash
+git clone https://github.com/zaidwhy/docstep.git
+cd docstep
+npm install
+npx @vscode/vsce package
+code --install-extension docstep-1.0.0-dev.vsix
+```
+
+If autoDocstring is also installed, disable or uninstall it: both extensions bind `ctrl+shift+2` and both offer a docstring on enter.
+
+## Switching from autoDocstring
+
+Settings moved from `autoDocstring.*` to `docstep.*`. You do not have to change anything: when a `docstep.*` setting is not set in user, workspace or folder settings, Docstep reads your `autoDocstring.*` value instead. Once you set the `docstep.*` key, it wins. To migrate for good, rename the keys in your `settings.json`.
+
+The command is now `docstep.generateDocstring`. A custom keybinding on `autoDocstring.generateDocstring` needs to be pointed at the new command.
 
 ## Docstring Formats
 
@@ -34,22 +42,21 @@ Cursor must be on the line directly below the definition to generate full auto-p
 
 -   Press enter after opening docstring with triple quotes (configurable `"""` or `'''`)
 -   Keyboard shortcut: `ctrl+shift+2` or `cmd+shift+2` for mac
-    -   Can be changed in Preferences -> Keyboard Shortcuts -> extension.generateDocstring
+    -   Can be changed in Preferences -> Keyboard Shortcuts -> `docstep.generateDocstring`
 -   Command: `Generate Docstring`
 -   Right click menu: `Generate Docstring`
 
 ## Extension Settings
 
-This extension contributes the following settings:
-
--   `autoDocstring.docstringFormat`: Switch between different docstring formats
--   `autoDocstring.customTemplatePath`: Path to a custom docstring template (absolute or relative to the project root)
--   `autoDocstring.generateDocstringOnEnter`: Generate the docstring on pressing enter after opening docstring
--   `autoDocstring.includeExtendedSummary`: Include extended summary section in docstring
--   `autoDocstring.includeName`: Include function name at the start of docstring
--   `autoDocstring.startOnNewLine`: New line before summary placeholder
--   `autoDocstring.guessTypes`: Infer types from type hints, default values and variable names
--   `autoDocstring.quoteStyle`: The style of quotes for docstrings
+-   `docstep.docstringFormat`: Switch between different docstring formats
+-   `docstep.customTemplatePath`: Path to a custom docstring template (absolute or relative to the project root)
+-   `docstep.generateDocstringOnEnter`: Generate the docstring on pressing enter after opening docstring
+-   `docstep.includeExtendedSummary`: Include extended summary section in docstring
+-   `docstep.includeName`: Include function name at the start of docstring
+-   `docstep.startOnNewLine`: New line before summary placeholder
+-   `docstep.guessTypes`: Infer types from type hints, default values and variable names
+-   `docstep.quoteStyle`: The style of quotes for docstrings
+-   `docstep.logLevel`: Output log level (`None`, `Info`, `Debug`)
 
 ## Custom Docstring Templates
 
@@ -120,22 +127,22 @@ This extension now supports custom templates. The extension uses the [mustache.j
 {{/placeholder}}
 ```
 
-## Changelog
+## Development
 
-Check the [CHANGELOG.md](CHANGELOG.md) for any version changes.
+```bash
+npm install
+npm run compile
+npm run unit_test
+```
 
 ## Reporting issues
 
-Report any issues on the github [issues](https://github.com/NilsJPWerner/autoDocstring/issues) page. Follow the template and add as much information as possible.
+Report Docstep issues on the [issues page](https://github.com/zaidwhy/docstep/issues). Please do not report Docstep bugs to the autoDocstring tracker.
 
-## Contributing
+## Credits
 
-The source code for this extension is hosted on [GitHub](https://github.com/NilsJPWerner/autoDocstring). Contributions, pull requests, suggestions, and bug reports are greatly appreciated.
-
--   Post any issues and suggestions to the github [issues page](https://github.com/NilsJPWerner/autoDocstring/issues). Add the `feature request` tag to any feature requests or suggestions.
--   To contribute, fork the project and then create a pull request back to master. Please update the README if you make any noticeable feature changes.
--   There is no official contribution guide or code of conduct yet, but please follow the standard open source norms and be respectful in any comments you make.
+Docstep is built on [autoDocstring](https://github.com/NilsJPWerner/autoDocstring), written by [Nils Werner](https://github.com/NilsJPWerner) and its contributors. The parser, the templates, the docs and the demo are theirs. Fixes taken from open upstream pull requests keep their authors as co-authors on the commit and are credited in the [CHANGELOG](CHANGELOG.md). If Docstep is useful to you, consider [sponsoring Nils](https://github.com/sponsors/NilsJPWerner).
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
+MIT, see [LICENSE](LICENSE). The original copyright notice by Nils Werner is kept.
