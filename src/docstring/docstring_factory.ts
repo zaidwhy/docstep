@@ -42,7 +42,9 @@ export class DocstringFactory {
             this.includeDescription,
         );
 
-        let docstring = render(this.template, templateData);
+        // A template saved with Windows line endings would leave "\r" on blank lines, which then
+        // count as content and get indented into whitespace-only lines.
+        let docstring = render(this.template, templateData).replace(/\r\n/g, "\n");
 
         docstring = this.addSnippetPlaceholders(docstring);
         docstring = this.condenseNewLines(docstring);

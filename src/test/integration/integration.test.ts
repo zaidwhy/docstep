@@ -227,6 +227,36 @@ describe("Basic Integration Tests", function () {
         });
     });
 
+    describe("Google Docstring Generation", function () {
+        before(async function () {
+            await vsc.workspace
+                .getConfiguration(settingsIdentifier)
+                .update("docstringFormat", "google", true);
+        });
+
+        after(async function () {
+            await vsc.workspace
+                .getConfiguration(settingsIdentifier)
+                .update("docstringFormat", "sphinx", true);
+        });
+
+        it("leaves the blank lines between sections empty", async function () {
+            const document = await vsc.workspace.openTextDocument({
+                language: "python",
+                content:
+                    "def pick(mode: int = 1) -> str:\n\n    if mode:\n        raise ValueError()\n    return str(mode)\n",
+            });
+            const editor = await vsc.window.showTextDocument(document);
+            editor.selection = new vsc.Selection(new vsc.Position(1, 0), new vsc.Position(1, 0));
+
+            expect(await vsc.commands.executeCommand(generateDocstringCommand)).to.equal(true);
+
+            const text = editor.document.getText();
+            expect(text).to.contain("Raises:");
+            expect(text.split("\n").filter((line) => /^[ \t]+$/.test(line))).to.deep.equal([]);
+        });
+    });
+
     describe("Module Docstring Generation", function () {
         it("does not indent a module docstring", async function () {
             await testDocstringGeneration({

@@ -474,6 +474,17 @@ describe("DocstringFactory", () => {
 
                 expect(result).to.equal('  """line1\n\n  line2"""');
             });
+
+            it("should not prepend the indentation to blank lines of a template with Windows line endings", () => {
+                const template = "line1\r\n\r\nline2";
+                const docstringComponents = defaultDocstringComponents;
+                docstringComponents.returns = { type: "a" };
+                const factory = new DocstringFactory(template);
+
+                const result = factory.generateDocstring(docstringComponents, "  ");
+
+                expect(result).to.equal('  """line1\n\n  line2"""');
+            });
         });
     });
 });
