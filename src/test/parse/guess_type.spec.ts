@@ -55,6 +55,14 @@ describe("guessType()", () => {
             expect(result).to.equal("int | str");
         });
 
+        it("should drop the spaces a multi-line type hint leaves inside its brackets", () => {
+            // getDefinition joins the lines of a definition with spaces.
+            const parameter = 'kind: Literal[ "fast", "slow" ]';
+            const result = guessType(parameter);
+
+            expect(result).to.equal('Literal["fast", "slow"]');
+        });
+
         it("should get type from args with Literal type hints", () => {
             const parameter = `param1: Literal["foo"]`;
             const result = guessType(parameter);

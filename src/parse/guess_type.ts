@@ -30,7 +30,8 @@ function getTypeFromTypeHint(parameter: string): string {
     let type = typeHintRegex[1].trim();
     type = type.replace(/^['"]|['"]$/g, "");
 
-    return type;
+    // A hint split over lines arrives joined with spaces, which would show as "Literal[ "a" ]".
+    return type.replace(/([[(])\s+/g, "$1").replace(/\s+([\])])/g, "$1");
 }
 
 function guessTypeFromDefaultValue(parameter: string): string {

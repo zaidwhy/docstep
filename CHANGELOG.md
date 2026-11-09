@@ -14,6 +14,7 @@ Docstep is a maintained fork of [autoDocstring](https://github.com/NilsJPWerner/
 -   Fixed: typing the opening quotes offered no docstring when the function body already held a triple quoted string, such as `x = """hello"""` ([upstream #68](https://github.com/NilsJPWerner/autoDocstring/issues/68)), or when a module level triple quoted string followed the function ([upstream #253](https://github.com/NilsJPWerner/autoDocstring/issues/253)).
 -   Fixed: a module docstring generated at the top of a file was indented ([upstream #152](https://github.com/NilsJPWerner/autoDocstring/issues/152)).
 -   Fixed: with a template saved with Windows line endings (the default on a Windows checkout, and any CRLF custom template), the blank lines between sections were filled with the indentation.
+-   Fixed: a type hint split over lines, such as a long `Literal[...]`, showed as `Literal[ "a", "b" ]` ([upstream #287](https://github.com/NilsJPWerner/autoDocstring/issues/287)).
 -   Fixed: CRLF newlines in templates were not condensed ([upstream PR #199](https://github.com/NilsJPWerner/autoDocstring/pull/199), @justinchuby)
 -   Fixed: definitions with PEP 695 type parameters, including `*Ts` and `**P` ([upstream PR #304](https://github.com/NilsJPWerner/autoDocstring/pull/304), @miminiao)
 -   Unit tests run on Node 22 and later without extra flags
