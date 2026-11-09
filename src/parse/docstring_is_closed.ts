@@ -54,6 +54,10 @@ function quotesOpenExistingDocstring(
     }
 
     for (const line of linesAfterPosition.slice(1)) {
+        // A line left of the docstring is outside the function, so its quotes are not ours.
+        if (!blankLine(line) && indentationOf(line) < originalIndentation) {
+            return false;
+        }
         const quotes = occurrences(line, quoteStyle);
         // An even count is a string that opens and closes on its own line, and quotes after
         // `=`, `(`, `,` or `return` open a new string; neither can close the docstring.
@@ -61,11 +65,7 @@ function quotesOpenExistingDocstring(
             return !opensString(line, quoteStyle);
         }
 
-        if (
-            (!blankLine(line) && indentationOf(line) < originalIndentation) ||
-            line.includes("def ") ||
-            line.includes("class ")
-        ) {
+        if (line.includes("def ") || line.includes("class ")) {
             return false;
         }
     }

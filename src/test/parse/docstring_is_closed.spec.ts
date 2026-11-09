@@ -90,6 +90,19 @@ describe("docstringIsClosed()", () => {
 
         expect(docstringIsClosed(report, 1, 7, '"""')).to.equal(false);
     });
+
+    it("should return false when a module level string follows the function", () => {
+        const signUp = [
+            "def sign_up(username):",
+            '    """',
+            "",
+            '"""',
+            "CREATE TABLE users (id INT);",
+            '"""',
+        ].join("\n");
+
+        expect(docstringIsClosed(signUp, 1, 7, '"""')).to.equal(false);
+    });
 });
 
 const closedDocstring = `
