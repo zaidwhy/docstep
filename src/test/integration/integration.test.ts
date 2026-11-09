@@ -3,7 +3,7 @@ import fs = require("fs");
 import "mocha";
 import * as path from "path";
 import * as vsc from "vscode";
-import { generateDocstringCommand } from "../../constants";
+import { generateDocstringCommand, updateDocstringCommand } from "../../constants";
 
 chai.config.truncateThreshold = 0;
 const expect = chai.expect;
@@ -203,7 +203,59 @@ describe("Basic Integration Tests", function () {
             });
         });
     });
+
+    describe("Docstring Update", function () {
+        const extension = vsc.extensions.getExtension(identifier);
+
+        before(async function () {
+            const settings = vsc.workspace.getConfiguration(settingsIdentifier);
+            await Promise.all([
+                settings.update("docstringFormat", "google", true),
+                settings.update("guessTypes", true, true),
+            ]);
+
+            await extension.activate();
+        });
+
+        it("updates a function docstring to its signature", async function () {
+            await testDocstringUpdate({
+                expectedOutputFilePath: path.resolve(
+                    __dirname,
+                    "./python_test_files/update_function_output.py",
+                ),
+                inputFilePath: path.resolve(__dirname, "./python_test_files/update_function.py"),
+                position: new vsc.Position(4, 0),
+            });
+        });
+
+        it("updates a class docstring from __init__ with the cursor on its decorator", async function () {
+            await testDocstringUpdate({
+                expectedOutputFilePath: path.resolve(
+                    __dirname,
+                    "./python_test_files/update_class_output.py",
+                ),
+                inputFilePath: path.resolve(__dirname, "./python_test_files/update_class.py"),
+                position: new vsc.Position(0, 0),
+            });
+        });
+    });
 });
+
+async function testDocstringUpdate(testCase: TestCase) {
+    const inputDocument = await vsc.workspace.openTextDocument(testCase.inputFilePath);
+    const expectedOutput = fs.readFileSync(testCase.expectedOutputFilePath, "utf8");
+
+    const editor = await vsc.window.showTextDocument(inputDocument);
+    editor.selection = new vsc.Selection(testCase.position, testCase.position);
+
+    const success = await vsc.commands.executeCommand(updateDocstringCommand);
+    expect(success).to.equal(true);
+    expect(editor.document.getText()).to.equal(expectedOutput);
+
+    // One undo must restore the original: the update is a single edit.
+    await vsc.commands.executeCommand("undo");
+    expect(editor.document.getText()).to.equal(fs.readFileSync(testCase.inputFilePath, "utf8"));
+}
 
 async function testDocstringGeneration(testCase: TestCase) {
     const inputDocument = await vsc.workspace.openTextDocument(testCase.inputFilePath);

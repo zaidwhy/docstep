@@ -4,7 +4,7 @@ import { logInfo } from "./logger";
 import { updateDocstring } from "./update";
 
 /**
- * Runs Update Docstring on the function under the cursor. The whole change is applied as
+ * Runs Update Docstring on the function or class under the cursor. The whole change is applied as
  * one WorkspaceEdit, so a single undo reverts it.
  */
 export function updateDocstringAtCursor(editor: vs.TextEditor | undefined): Thenable<boolean> {
