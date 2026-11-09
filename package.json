@@ -49,6 +49,11 @@
             {
                 "command": "docstep.generateDocstring",
                 "title": "Generate Docstring"
+            },
+            {
+                "command": "docstep.updateDocstring",
+                "title": "Update Docstring",
+                "category": "Docstep"
             }
         ],
         "keybindings": [

@@ -1,7 +1,8 @@
 import * as vs from "vscode";
 import { AutoDocstring } from "./generate_docstring";
 import { validEnterActivation } from "./enter_activation";
-import { extensionRoot, generateDocstringCommand } from "./constants";
+import { updateDocstringAtCursor } from "./update_docstring";
+import { extensionRoot, generateDocstringCommand, updateDocstringCommand } from "./constants";
 import { getSetting } from "./config";
 import { getStackTrace } from "./telemetry";
 import { logInfo, logError } from "./logger";
@@ -17,12 +18,14 @@ export function activate(context: vs.ExtensionContext): void {
             try {
                 return autoDocstring.generateDocstring();
             } catch (error) {
-                const errorString = JSON.stringify(error);
-                let stackTrace = "";
-                if (error instanceof Error) {
-                    stackTrace = "\n\t" + getStackTrace(error);
-                }
-                return logError(errorString + stackTrace);
+                return logCommandError(error);
+            }
+        }),
+        vs.commands.registerCommand(updateDocstringCommand, () => {
+            try {
+                return updateDocstringAtCursor(vs.window.activeTextEditor);
+            } catch (error) {
+                return logCommandError(error);
             }
         }),
     );
@@ -81,6 +84,15 @@ class AutoDocstringCompletionItem extends vs.CompletionItem {
             title: "Generate Docstring",
         };
     }
+}
+
+function logCommandError(error: unknown): Thenable<string> {
+    const errorString = JSON.stringify(error);
+    let stackTrace = "";
+    if (error instanceof Error) {
+        stackTrace = "\n\t" + getStackTrace(error);
+    }
+    return logError(errorString + stackTrace);
 }
 
 function getQuoteStyle(): string {
