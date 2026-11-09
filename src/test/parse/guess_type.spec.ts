@@ -43,9 +43,9 @@ describe("guessType()", () => {
             expect(result).to.equal("int");
 
             const parameter2 = " arg  :\tstr ";
-            const result2 = guessType(parameter2);
+            const tabSpacedType = guessType(parameter2);
 
-            expect(result2).to.equal("str");
+            expect(tabSpacedType).to.equal("str");
         });
 
         it("should get type from PEP 604 style type hint", () => {

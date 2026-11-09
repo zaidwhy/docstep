@@ -15,10 +15,10 @@ describe("getFunctionName()", () => {
     });
 
     it("should get the function definition from a function with weird spacing", () => {
-        const functionDefinition = 'def  Func1  (argument, kwarg="abc"):';
+        const functionDefinition = 'def  area  (argument, kwarg="abc"):';
         const result = getFunctionName(functionDefinition);
 
-        expect(result).to.eql("Func1");
+        expect(result).to.eql("area");
     });
 
     it("should get the function name from a generic function (PEP 695)", () => {

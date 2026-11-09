@@ -36,6 +36,7 @@ export class AutoDocstring {
         success.then(
             () => logInfo("Successfully inserted docstring"),
             (reason) => {
+                // craft-guard: allow sec-sqli because this builds an error message, no SQL is involved
                 throw new Error("Could not insert docstring: " + JSON.stringify(reason));
             },
         );

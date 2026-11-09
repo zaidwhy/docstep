@@ -68,10 +68,10 @@ describe("getTemplate()", () => {
     context("when asked for anything else", () => {
         it("should return the string containing the docblockr mustache template", () => {
             const result = getTemplate("blah");
-            const result2 = getTemplate("default");
+            const defaultTemplate = getTemplate("default");
 
             expect(result).to.contain("DocBlockr Docstring Template");
-            expect(result2).to.contain("DocBlockr Docstring Template");
+            expect(defaultTemplate).to.contain("DocBlockr Docstring Template");
         });
     });
 });

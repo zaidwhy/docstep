@@ -43,9 +43,9 @@ describe("getBody()", () => {
 
         expect(result).to.have.deep.members(["return 2"]);
 
-        const result2 = getBody(indentedFunctions, 6);
+        const nestedBody = getBody(indentedFunctions, 6);
 
-        expect(result2).to.have.deep.members(["pass"]);
+        expect(nestedBody).to.have.deep.members(["pass"]);
     });
 
     it("should return an empty array if a function has no body", () => {
@@ -53,9 +53,9 @@ describe("getBody()", () => {
 
         expect(result).to.have.deep.members([]);
 
-        const result2 = getBody(noBody, 4);
+        const laterEmptyBody = getBody(noBody, 4);
 
-        expect(result2).to.have.deep.members([]);
+        expect(laterEmptyBody).to.have.deep.members([]);
     });
 });
 
