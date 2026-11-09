@@ -87,7 +87,7 @@ def fetch(url: str, timeout: float = 5.0) -> bytes:
 
 It works with the `google`, `numpy` and `sphinx` formats and their `-notypes` variants, read from `docstep.docstringFormat`.
 
-On a class, with the cursor on the `class` line, one of its decorators or inside its docstring, the command matches the class docstring's parameters to the class's own `__init__`, as the Google and NumPy style guides allow. Base classes are never treated as parameters, and what `__init__` returns or raises stays in the `__init__` docstring. A `@dataclass` without its own `__init__` is documented from the fields its generated `__init__` takes: `ClassVar` fields, `field(init=False)` and the `KW_ONLY` marker are left out, `InitVar` fields are kept, and a `default_factory` shows as `list()` and so on. Fields inherited from a base dataclass are not seen. With the cursor inside `__init__`, the `__init__` docstring is updated instead. Generate Docstring follows the same rules for a new class docstring.
+On a class, with the cursor on the `class` line, one of its decorators or inside its docstring, the command matches the class docstring's parameters to the class's own `__init__`, as the Google and NumPy style guides allow. Base classes are never treated as parameters, and what `__init__` returns or raises stays in the `__init__` docstring. With `@overload` stubs, the last `__init__` is the one read. A `@dataclass` (but not `@dataclass(init=False)`) without its own `__init__` is documented from the fields its generated `__init__` takes: `ClassVar` fields, `field(init=False)` and the `KW_ONLY` marker are left out, `InitVar` fields are kept, and a `default_factory` shows as `list()` and so on. Fields inherited from a base dataclass are not seen. With the cursor inside `__init__`, the `__init__` docstring is updated instead. Generate Docstring follows the same rules for a new class docstring.
 
 | What | Rule |
 | --- | --- |
@@ -111,6 +111,7 @@ Docstep makes no edit, and says why, when it cannot read the docstring with conf
 -   `docstep.docstringFormat` is not google, numpy or sphinx (the message names it), or `docstep.customTemplatePath` is set
 -   the cursor is not on a `def` line, inside a function, or on a class header or class docstring, or the body is on the same line as the `def` or `class`
 -   the class has no `__init__` of its own and is not a dataclass, such as a class that inherits its constructor
+-   the class's `__init__` has its body on the `def` line
 -   the cursor is on a decorator that decorates neither a function nor a class
 
 ## Extension Settings
