@@ -1,6 +1,6 @@
 # Docstep
 
-Docstep is a VS Code extension that generates Python docstrings from a function or class signature, in Google, NumPy, Sphinx, PEP 257, docBlockr, doxygen or a custom mustache template. It is a maintained fork of [autoDocstring](https://github.com/NilsJPWerner/autoDocstring) by Nils Werner, whose last release was 0.6.1 in February 2022. On top of upstream it fixes docstrings indented to the editor tab size instead of the function body ([#315](https://github.com/NilsJPWerner/autoDocstring/issues/315)), the ignored `generateDocstringOnEnter` setting ([#312](https://github.com/NilsJPWerner/autoDocstring/issues/312)), CRLF templates, and functions and classes with PEP 695 type parameters. The full list is in the [CHANGELOG](CHANGELOG.md).
+Docstep is a VS Code extension that generates Python docstrings from a function or class signature, in Google, NumPy, Sphinx, PEP 257, docBlockr, doxygen or a custom mustache template. It is a maintained fork of [autoDocstring](https://github.com/NilsJPWerner/autoDocstring) by Nils Werner, whose last release was 0.6.1 in February 2022. On top of upstream it fixes docstrings indented to the editor tab size instead of the function body ([#315](https://github.com/NilsJPWerner/autoDocstring/issues/315)), the ignored `generateDocstringOnEnter` setting ([#312](https://github.com/NilsJPWerner/autoDocstring/issues/312)), CRLF templates, and functions and classes with PEP 695 type parameters. It also adds an [Update Docstring](#updating-a-docstring) command that brings an existing docstring in line with a changed signature, the most requested autoDocstring feature. The full list is in the [CHANGELOG](CHANGELOG.md).
 
 ![Generating a docstring](images/demo.gif)
 
@@ -45,6 +45,67 @@ Cursor must be on the line directly below the definition to generate full auto-p
     -   Can be changed in Preferences -> Keyboard Shortcuts -> `docstep.generateDocstring`
 -   Command: `Generate Docstring`
 -   Right click menu: `Generate Docstring`
+
+## Updating a docstring
+
+When a signature changes, run `Docstep: Update Docstring` from the command palette with the cursor on the `def` line or anywhere inside the function, including its docstring. Docstep rewrites the docstring to match the signature and keeps what you wrote. It only edits when you run the command, never on save or while typing, and the whole change is one edit, so a single undo reverts it. The command has no default keybinding; bind `docstep.updateDocstring` in Preferences -> Keyboard Shortcuts if you want one.
+
+Before, after adding `timeout` and removing `retries`:
+
+```python
+def fetch(url: str, timeout: float = 5.0) -> bytes:
+    """Download a URL.
+
+    Args:
+        retries (int): How often to retry.
+        url (str): The address to fetch.
+
+    Examples:
+        >>> fetch("https://example.com")
+    """
+```
+
+After:
+
+```python
+def fetch(url: str, timeout: float = 5.0) -> bytes:
+    """Download a URL.
+
+    Args:
+        url (str): The address to fetch.
+        timeout (float, optional): _description_. Defaults to 5.0.
+
+    Returns:
+        bytes: _description_
+
+    Examples:
+        >>> fetch("https://example.com")
+    """
+```
+
+It works with the `google`, `numpy` and `sphinx` formats and their `-notypes` variants, read from `docstep.docstringFormat`.
+
+| What | Rule |
+| --- | --- |
+| Kept | The description you wrote for every parameter still in the signature, word for word. The summary, extended description, quote style, indentation, line endings and every section Docstep does not model (Examples, Notes, See Also, `.. note::` blocks and so on) stay byte for byte. |
+| Added | Parameters new in the signature, with the same `_type_` and `_description_` placeholders Generate Docstring writes. Raises, Returns and Yields sections (or `:raises:`, `:return:` and `:yield:` fields) when Generate Docstring would add them, and a newly raised exception in an existing Raises section. |
+| Removed | Parameters no longer in the signature, with their descriptions. A section left empty goes too. Returns, Yields and Raises entries are never removed, because the body scan that finds them can miss a return or raise in a called function. |
+| Order | Parameters follow the signature. In sphinx, each `:type:` field moves under its `:param:` field. |
+| Types | In the typed formats a parameter's type becomes its annotation, and `, optional` follows whether it has a default. A type you wrote is kept when the signature has no annotation. A single Returns or Yields entry follows the return annotation. The `-notypes` formats never touch types. |
+| Defaults | A description that is still the `_description_` placeholder is regenerated, so its default follows the signature. A description you wrote is never edited, so a default you mention in it is not updated. |
+| Renames | A renamed parameter is one parameter removed and another added: the old description is dropped and the new name gets a placeholder. Copy the description across first if you want to keep it. |
+| `self`, `cls`, `*args`, `**kwargs` | `self` and `cls` are skipped, as in Generate Docstring. Documented `*args` and `**kwargs` stay, in signature order, but are not added when missing. |
+
+Docstep makes no edit, and says why, when it cannot read the docstring with confidence:
+
+-   the function has no docstring (run Generate Docstring instead), or the docstring is empty, not closed, single quoted, or followed by code on its line
+-   the docstring looks like a different format than `docstep.docstringFormat` (numpy underlines or `:param:` fields under the google setting, for example), or mixes formats
+-   an entry it cannot read, such as `a is the first value` under Args, combined numpy entries like `x1, x2 : int`, or a parameter documented twice
+-   a section header with text on the same line (`Returns: the value.`), two sections of the same kind, or a Keyword Args or Other Parameters section
+-   sphinx fields split into two blocks by text
+-   mixed CRLF and LF line endings inside the docstring
+-   `docstep.docstringFormat` is not google, numpy or sphinx (the message names it), or `docstep.customTemplatePath` is set
+-   the cursor is not on a `def` line or inside a function, or the function body is on the `def` line
 
 ## Extension Settings
 

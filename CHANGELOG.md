@@ -4,6 +4,7 @@
 
 Docstep is a maintained fork of [autoDocstring](https://github.com/NilsJPWerner/autoDocstring) by Nils Werner, forked from upstream commit `c9da641` (after 0.6.1). Everything below this section is autoDocstring's history, kept as written.
 
+-   Added `Docstep: Update Docstring` (`docstep.updateDocstring`), which brings an existing google, numpy or sphinx docstring in line with a changed signature: it keeps written descriptions, adds new parameters, removes old ones, reorders them and updates types, and refuses with a message when it cannot read the docstring. This was the most requested autoDocstring feature ([upstream #28](https://github.com/NilsJPWerner/autoDocstring/issues/28), asked for by @Bloodmallet, and [upstream #177](https://github.com/NilsJPWerner/autoDocstring/issues/177), asked for by @kretes for renamed parameters). Thanks to them and everyone who added their voice in those threads.
 -   Renamed the extension, the `generateDocstring` command and the settings namespace from `autoDocstring.*` to `docstep.*`. An unset `docstep.*` setting falls back to the user's `autoDocstring.*` value.
 -   Fixed: `generateDocstringOnEnter` was never read ([upstream #312](https://github.com/NilsJPWerner/autoDocstring/issues/312))
 -   Fixed: docstring indented by the editor tab size instead of the function body ([upstream #315](https://github.com/NilsJPWerner/autoDocstring/issues/315))
