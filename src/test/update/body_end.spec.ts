@@ -44,3 +44,26 @@ describe("updateDocstring() with body lines indented less than the def", () => {
         expect(updated("google", source, 11)).to.contain("        path (_type_): _description_");
     });
 });
+
+describe("updateDocstring() with a def inside a string", () => {
+    it("should update the function around the string, not the def written in it", () => {
+        const source = py(
+            "def outer(x):",
+            '    """Outer.',
+            "",
+            "    Args:",
+            "        old (int): Gone.",
+            '    """',
+            '    template = """',
+            "def fake(y):",
+            "    pass",
+            '"""',
+            "    return template",
+        );
+
+        const result = updated("google", source, 8);
+
+        expect(result).to.contain("        x (_type_): _description_");
+        expect(result).not.to.contain("old (int)");
+    });
+});

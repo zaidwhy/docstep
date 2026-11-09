@@ -37,7 +37,11 @@ const initPattern = /^\s*(?:async\s+)?def\s+__init__\b/;
 export function locateFunction(lines: string[], cursorLine: number): FunctionLocation {
     // A cursor on a decorator means the function it decorates, never the one around it.
     cursorLine = decoratedDefLine(lines, Math.min(cursorLine, lines.length - 1)) ?? cursorLine;
+    const insideStrings = linesInsideStrings(lines);
     for (let line = Math.min(cursorLine, lines.length - 1); line >= 0; line--) {
+        if (insideStrings.has(line)) {
+            continue;
+        }
         const defMatch = lines[line].match(defPattern);
         const classMatch = defMatch == null ? lines[line].match(classPattern) : null;
         const match = defMatch ?? classMatch;
@@ -170,6 +174,41 @@ export function locateInit(lines: string[], cls: FunctionLocation): FunctionLoca
         line = statementEnd(lines, line);
     }
     return undefined;
+}
+
+/** Lines that start inside a triple-quoted string, where a `def` is text and not code. */
+function linesInsideStrings(lines: string[]): Set<number> {
+    const inside = new Set<number>();
+    let quote: string | undefined;
+    for (let lineNumber = 0; lineNumber < lines.length; lineNumber++) {
+        if (quote !== undefined) {
+            inside.add(lineNumber);
+        }
+        const line = lines[lineNumber];
+        for (let index = 0; index < line.length; index++) {
+            const char = line[index];
+            if (quote !== undefined) {
+                if (char === "\\") {
+                    index++;
+                } else if (line.startsWith(quote, index)) {
+                    index += quote.length - 1;
+                    quote = undefined;
+                }
+                continue;
+            }
+            if (char === "#") {
+                break;
+            }
+            if (char === '"' || char === "'") {
+                quote = line.startsWith(char.repeat(3), index) ? char.repeat(3) : char;
+                index += quote.length - 1;
+            }
+        }
+        if (quote !== undefined && quote.length === 1) {
+            quote = undefined;
+        }
+    }
+    return inside;
 }
 
 /** Last line of the statement starting at `start`, following open brackets across lines. */

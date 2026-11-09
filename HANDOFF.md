@@ -31,5 +31,4 @@ Taken without Zaid on 2026-11-10 under the overnight directive. Each one is a si
 
 ## Known gaps
 
-- A `def` written inside a multi-line string at column 0 can still be taken for a real def by the backward scan in `src/update/locate.ts`.
 - The Enter/completion check (`src/parse/docstring_is_closed.ts`) decides from the text on each line, not from a tokenizer. Quotes inside a comment, or a closing line like `text = """` inside a docstring, can still mislead it.
