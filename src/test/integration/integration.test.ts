@@ -42,7 +42,7 @@ describe("Basic Integration Tests", function () {
             await extension.activate();
 
             document = await vsc.workspace.openTextDocument({ language: "python" });
-            editor = await vsc.window.showTextDocument(document);
+            editor = await showFocused(document);
         });
 
         it("will activate the Generate Docstring completion item after triple quotes", async function () {
@@ -52,10 +52,7 @@ describe("Basic Integration Tests", function () {
                 edit.insert(new vsc.Position(0, 0), '\n    """');
             });
 
-            await vsc.commands.executeCommand("editor.action.triggerSuggest");
-            await delay(200);
-            await vsc.commands.executeCommand("acceptSelectedSuggestion");
-            await delay(600);
+            await acceptSuggestion(document);
             expect(document.getText().split('"""')).to.have.length(3);
             expect(document.getText()).to.contain("_summary_");
         });
@@ -71,10 +68,7 @@ describe("Basic Integration Tests", function () {
             });
             editor.selection = new vsc.Selection(new vsc.Position(1, 7), new vsc.Position(1, 7));
 
-            await vsc.commands.executeCommand("editor.action.triggerSuggest");
-            await delay(200);
-            await vsc.commands.executeCommand("acceptSelectedSuggestion");
-            await delay(600);
+            await acceptSuggestion(document);
             // A plain word suggestion can also insert "_summary_"; only the generated docstring closes its quotes.
             expect(document.getText().split('"""')).to.have.length(5);
             expect(document.getText()).to.contain("_summary_");
@@ -88,10 +82,7 @@ describe("Basic Integration Tests", function () {
                 edit.insert(new vsc.Position(0, 0), "\n    '''");
             });
 
-            await vsc.commands.executeCommand("editor.action.triggerSuggest");
-            await delay(200);
-            await vsc.commands.executeCommand("acceptSelectedSuggestion");
-            await delay(600);
+            await acceptSuggestion(document);
             expect(document.getText().split("'''")).to.have.length(3);
             expect(document.getText()).to.contain("_summary_");
         });
@@ -103,10 +94,7 @@ describe("Basic Integration Tests", function () {
                 edit.insert(new vsc.Position(0, 0), '\r\n    """');
             });
 
-            await vsc.commands.executeCommand("editor.action.triggerSuggest");
-            await delay(200);
-            await vsc.commands.executeCommand("acceptSelectedSuggestion");
-            await delay(600);
+            await acceptSuggestion(document);
             expect(document.getText().split('"""')).to.have.length(3);
             expect(document.getText()).to.contain("_summary_");
         });
@@ -246,7 +234,7 @@ describe("Basic Integration Tests", function () {
                 content:
                     "def pick(mode: int = 1) -> str:\n\n    if mode:\n        raise ValueError()\n    return str(mode)\n",
             });
-            const editor = await vsc.window.showTextDocument(document);
+            const editor = await showFocused(document);
             editor.selection = new vsc.Selection(new vsc.Position(1, 0), new vsc.Position(1, 0));
 
             expect(await vsc.commands.executeCommand(generateDocstringCommand)).to.equal(true);
@@ -261,7 +249,7 @@ describe("Basic Integration Tests", function () {
                 language: "python",
                 content: "def pick(mode):\n    \n    return mode\n",
             });
-            const editor = await vsc.window.showTextDocument(document);
+            const editor = await showFocused(document);
             editor.selection = new vsc.Selection(new vsc.Position(1, 4), new vsc.Position(1, 4));
 
             expect(await vsc.commands.executeCommand(generateDocstringCommand)).to.equal(true);
@@ -286,7 +274,10 @@ describe("Basic Integration Tests", function () {
             );
             await vsc.commands.executeCommand("vscode.open", notebook.uri);
             await vsc.commands.executeCommand("notebook.cell.edit");
-            await delay(300);
+            await waitFor(
+                () => vsc.window.activeTextEditor?.document.uri.scheme === "vscode-notebook-cell",
+                5000,
+            );
             const editor = vsc.window.activeTextEditor;
             expect(editor.document.uri.scheme).to.equal("vscode-notebook-cell");
             editor.selection = new vsc.Selection(new vsc.Position(1, 0), new vsc.Position(1, 0));
@@ -374,7 +365,7 @@ async function testDocstringUpdate(testCase: TestCase) {
     const inputDocument = await vsc.workspace.openTextDocument(testCase.inputFilePath);
     const expectedOutput = fs.readFileSync(testCase.expectedOutputFilePath, "utf8");
 
-    const editor = await vsc.window.showTextDocument(inputDocument);
+    const editor = await showFocused(inputDocument);
     editor.selection = new vsc.Selection(testCase.position, testCase.position);
 
     const success = await vsc.commands.executeCommand(updateDocstringCommand);
@@ -390,13 +381,13 @@ async function testDocstringGeneration(testCase: TestCase) {
     const inputDocument = await vsc.workspace.openTextDocument(testCase.inputFilePath);
     const expectedOutput = fs.readFileSync(testCase.expectedOutputFilePath, "utf8");
 
-    await vsc.window.showTextDocument(inputDocument);
-    vsc.window.activeTextEditor.selection = new vsc.Selection(testCase.position, testCase.position);
+    const editor = await showFocused(inputDocument);
+    editor.selection = new vsc.Selection(testCase.position, testCase.position);
 
     const success = await vsc.commands.executeCommand(generateDocstringCommand);
     expect(success).to.equal(true);
 
-    const documentText = vsc.window.activeTextEditor.document.getText();
+    const documentText = editor.document.getText();
     expect(documentText).to.equal(expectedOutput);
 }
 
@@ -404,6 +395,45 @@ interface TestCase {
     inputFilePath: string;
     position: vsc.Position;
     expectedOutputFilePath: string;
+}
+
+/**
+ * Shows `document` and waits until it is the active editor. The commands act on the active
+ * editor, and a notebook cell editor from an earlier test can keep that role for a moment.
+ */
+async function showFocused(document: vsc.TextDocument): Promise<vsc.TextEditor> {
+    const editor = await vsc.window.showTextDocument(document);
+    const focused = await waitFor(() => vsc.window.activeTextEditor?.document === document, 5000);
+    expect(focused, "the document never became the active editor").to.equal(true);
+    return editor;
+}
+
+/**
+ * Opens the suggest widget and accepts the top suggestion, then waits for the docstring.
+ * The widget fills asynchronously, so an early accept is a no-op and is repeated until the
+ * document changes; a fixed wait instead let a late accept land in the next test's editor.
+ */
+async function acceptSuggestion(document: vsc.TextDocument): Promise<void> {
+    const before = document.getText();
+    await vsc.commands.executeCommand("editor.action.triggerSuggest");
+    const deadline = Date.now() + 5000;
+    while (document.getText() === before && Date.now() < deadline) {
+        await vsc.commands.executeCommand("acceptSelectedSuggestion");
+        await waitFor(() => document.getText() !== before, 100);
+    }
+    await waitFor(() => document.getText().includes("_summary_"), deadline - Date.now());
+}
+
+/** Polls `condition` every 20 ms until it holds or `timeout` ms pass. Returns whether it held. */
+async function waitFor(condition: () => boolean, timeout: number): Promise<boolean> {
+    const deadline = Date.now() + timeout;
+    while (!condition()) {
+        if (Date.now() >= deadline) {
+            return false;
+        }
+        await delay(20);
+    }
+    return true;
 }
 
 function delay(timeout: number) {
