@@ -56,6 +56,7 @@ describe("Basic Integration Tests", function () {
             await delay(200);
             await vsc.commands.executeCommand("acceptSelectedSuggestion");
             await delay(600);
+            expect(document.getText().split('"""')).to.have.length(3);
             expect(document.getText()).to.contain("_summary_");
         });
 
@@ -91,6 +92,7 @@ describe("Basic Integration Tests", function () {
             await delay(200);
             await vsc.commands.executeCommand("acceptSelectedSuggestion");
             await delay(600);
+            expect(document.getText().split("'''")).to.have.length(3);
             expect(document.getText()).to.contain("_summary_");
         });
 
@@ -105,6 +107,7 @@ describe("Basic Integration Tests", function () {
             await delay(200);
             await vsc.commands.executeCommand("acceptSelectedSuggestion");
             await delay(600);
+            expect(document.getText().split('"""')).to.have.length(3);
             expect(document.getText()).to.contain("_summary_");
         });
     });
