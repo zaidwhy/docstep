@@ -11,7 +11,10 @@ function section(
 ): SettingsSection {
     return {
         get: (key) => (key in userValues ? userValues[key] : defaults[key]),
-        inspect: (key): SettingInspection => ({ globalValue: userValues[key] }),
+        inspect: (key): SettingInspection => ({
+            defaultValue: defaults[key],
+            globalValue: userValues[key],
+        }),
     };
 }
 
@@ -35,6 +38,13 @@ describe("readSetting()", () => {
         const legacy = section({}, { generateDocstringOnEnter: false });
 
         expect(readSetting("generateDocstringOnEnter", current, legacy)).to.equal(false);
+    });
+
+    it("should use the docstep default when a setting is null, not crash on it", () => {
+        const current = section({ customTemplatePath: "" }, { customTemplatePath: null });
+        const legacy = section({}, { customTemplatePath: null });
+
+        expect(readSetting("customTemplatePath", current, legacy)).to.equal("");
     });
 
     it("should use the docstep default when neither namespace is set", () => {

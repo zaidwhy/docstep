@@ -5,6 +5,7 @@
  */
 
 export interface SettingInspection {
+    defaultValue?: unknown;
     globalValue?: unknown;
     workspaceValue?: unknown;
     workspaceFolderValue?: unknown;
@@ -36,15 +37,19 @@ export function isSetByUser(inspection: SettingInspection | undefined): boolean 
 /**
  * Value of `key` from the current section if the user set it there, else from the
  * legacy section if the user set it there, else the current section's default.
+ * A null value (`"docstep.quoteStyle": null` in settings.json) also gets the default,
+ * since every caller expects the setting's own type.
  */
 export function readSetting(
     key: string,
     current: SettingsSection,
     legacy: SettingsSection,
 ): unknown {
-    if (!isSetByUser(current.inspect(key)) && isSetByUser(legacy.inspect(key))) {
-        return legacy.get(key);
-    }
+    const inspection = current.inspect(key);
+    const value =
+        !isSetByUser(inspection) && isSetByUser(legacy.inspect(key))
+            ? legacy.get(key)
+            : current.get(key);
 
-    return current.get(key);
+    return value ?? inspection?.defaultValue;
 }
