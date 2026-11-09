@@ -93,10 +93,9 @@ describe("getDocstringIndentation()", () => {
         });
     });
 
-    it("should default to default indentation if no indentation is found", () => {
-        const result = getDocstringIndentation("", 0, " ".repeat(4));
-
-        expect(result).to.equal(" ".repeat(4));
+    it("should not indent a module docstring when no definition is above it", () => {
+        expect(getDocstringIndentation("", 0, " ".repeat(4))).to.equal("");
+        expect(getDocstringIndentation("# header\n\nimport os", 1, " ".repeat(4))).to.equal("");
     });
 });
 

@@ -9,7 +9,8 @@ Docstep is a maintained fork of [autoDocstring](https://github.com/NilsJPWerner/
 -   Renamed the extension, the `generateDocstring` command and the settings namespace from `autoDocstring.*` to `docstep.*`. An unset `docstep.*` setting falls back to the user's `autoDocstring.*` value.
 -   Fixed: `generateDocstringOnEnter` was never read ([upstream #312](https://github.com/NilsJPWerner/autoDocstring/issues/312))
 -   Fixed: docstring indented by the editor tab size instead of the function body ([upstream #315](https://github.com/NilsJPWerner/autoDocstring/issues/315))
--   Fixed: a class docstring listed the base classes as arguments. It now documents the parameters of the class's own `__init__`, and none when the class has no `__init__`.
+-   Fixed: a class docstring listed the base classes as arguments. It now documents the parameters of the class's own `__init__`, and none when the class has no `__init__` ([upstream #246](https://github.com/NilsJPWerner/autoDocstring/issues/246), part of [upstream #27](https://github.com/NilsJPWerner/autoDocstring/issues/27)).
+-   Fixed: a module docstring generated at the top of a file was indented ([upstream #152](https://github.com/NilsJPWerner/autoDocstring/issues/152)).
 -   Fixed: CRLF newlines in templates were not condensed ([upstream PR #199](https://github.com/NilsJPWerner/autoDocstring/pull/199), @justinchuby)
 -   Fixed: definitions with PEP 695 type parameters, including `*Ts` and `**P` ([upstream PR #304](https://github.com/NilsJPWerner/autoDocstring/pull/304), @miminiao)
 -   Unit tests run on Node 22 and later without extra flags

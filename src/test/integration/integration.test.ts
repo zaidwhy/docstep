@@ -204,6 +204,19 @@ describe("Basic Integration Tests", function () {
         });
     });
 
+    describe("Module Docstring Generation", function () {
+        it("does not indent a module docstring", async function () {
+            await testDocstringGeneration({
+                expectedOutputFilePath: path.resolve(
+                    __dirname,
+                    "./python_test_files/file_module_output.py",
+                ),
+                inputFilePath: path.resolve(__dirname, "./python_test_files/file_module.py"),
+                position: new vsc.Position(1, 0),
+            });
+        });
+    });
+
     describe("Class Docstring Generation", function () {
         it("documents the __init__ parameters, not the base classes", async function () {
             await testDocstringGeneration({

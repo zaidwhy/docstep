@@ -29,7 +29,8 @@ export function getDocstringIndentation(
         currentLineNum--;
     }
 
-    return defaultIndentation;
+    // No def or class above: this is a module docstring, which sits at column 0.
+    return "";
 }
 
 /**
