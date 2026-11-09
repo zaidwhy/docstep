@@ -20,6 +20,7 @@ export function updateDocstringAtCursor(editor: vs.TextEditor | undefined): Then
         docstringFormat: getSetting("docstringFormat").toString(),
         customTemplatePath: getSetting("customTemplatePath").toString(),
         guessTypes: getSetting("guessTypes") === true,
+        includeVariadicArgs: getSetting("includeVariadicArgs") === true,
     });
 
     if (result.kind !== "edit") {

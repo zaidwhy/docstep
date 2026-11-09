@@ -19,6 +19,8 @@ export function parseParameters(
         decorators: parseDecorators(parameterTokens),
         args: parseArguments(parameterTokens),
         kwargs: parseKeywordArguments(parameterTokens),
+        starArgs: parseStarred(parameterTokens, "*"),
+        starKwargs: parseStarred(parameterTokens, "**"),
         returns: parseReturn(parameterTokens, body),
         yields: parseYields(parameterTokens, body),
         exceptions: parseExceptions(body),
@@ -63,6 +65,22 @@ function parseArguments(parameters: string[]): Argument[] {
     }
 
     return args;
+}
+
+/** `*args` or `**kwargs` parameters; a bare `*` marks keyword-only parameters and is skipped. */
+function parseStarred(parameters: string[], stars: "*" | "**"): Argument[] {
+    const pattern = stars === "*" ? /^\*(?!\*)(\w+)/ : /^\*\*(\w+)/;
+    const starred: Argument[] = [];
+    for (const param of parameters) {
+        const match = param.trim().match(pattern);
+        if (match != null) {
+            starred.push({
+                var: stars + match[1],
+                type: guessType(param.trim().slice(stars.length)),
+            });
+        }
+    }
+    return starred;
 }
 
 function parseKeywordArguments(parameters: string[]): KeywordArgument[] {

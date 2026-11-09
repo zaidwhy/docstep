@@ -98,7 +98,7 @@ On a class, with the cursor on the `class` line, one of its decorators or inside
 | Types | In the typed formats a parameter's type becomes its annotation, and `, optional` follows whether it has a default. A type you wrote is kept when the signature has no annotation. A single Returns or Yields entry follows the return annotation. The `-notypes` formats never touch types. |
 | Defaults | A description that is still the `_description_` placeholder is regenerated, so its default follows the signature. A description you wrote is never edited, so a default you mention in it is not updated. |
 | Renames | A renamed parameter is one parameter removed and another added: the old description is dropped and the new name gets a placeholder. Copy the description across first if you want to keep it. |
-| `self`, `cls`, `*args`, `**kwargs` | `self` and `cls` are skipped, as in Generate Docstring. Documented `*args` and `**kwargs` stay, in signature order, but are not added when missing. |
+| `self`, `cls`, `*args`, `**kwargs` | `self` and `cls` are skipped, as in Generate Docstring. Documented `*args` and `**kwargs` stay, in signature order. Missing ones are added only when `docstep.includeVariadicArgs` is on. |
 
 Docstep makes no edit, and says why, when it cannot read the docstring with confidence:
 
@@ -123,6 +123,7 @@ Docstep makes no edit, and says why, when it cannot read the docstring with conf
 -   `docstep.includeName`: Include function name at the start of docstring
 -   `docstep.startOnNewLine`: New line before summary placeholder
 -   `docstep.guessTypes`: Infer types from type hints, default values and variable names
+-   `docstep.includeVariadicArgs`: Document `*args` and `**kwargs` (off by default). Generate Docstring lists `*args` after the positional parameters and `**kwargs` last, in every format, and Update Docstring adds them when they are missing
 -   `docstep.quoteStyle`: The style of quotes for docstrings
 -   `docstep.logLevel`: Output log level (`None`, `Info`, `Debug`)
 

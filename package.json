@@ -120,6 +120,11 @@
                     "default": false,
                     "description": "Start docstring on new line"
                 },
+                "docstep.includeVariadicArgs": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Document *args and **kwargs: Generate Docstring lists them, and Update Docstring adds them when missing"
+                },
                 "docstep.guessTypes": {
                     "type": "boolean",
                     "default": true,

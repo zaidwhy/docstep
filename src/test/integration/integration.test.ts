@@ -244,6 +244,34 @@ describe("Basic Integration Tests", function () {
             expect(text.split("\n").filter((line) => /^[ \t]+$/.test(line))).to.deep.equal([]);
         });
 
+        it("lists *args and **kwargs only when includeVariadicArgs is on", async function () {
+            const settings = vsc.workspace.getConfiguration(settingsIdentifier);
+            const generateFor = async () => {
+                const document = await vsc.workspace.openTextDocument({
+                    language: "python",
+                    content: "def send(to, *args, **kwargs):\n\n    pass\n",
+                });
+                const editor = await showFocused(document);
+                editor.selection = new vsc.Selection(
+                    new vsc.Position(1, 0),
+                    new vsc.Position(1, 0),
+                );
+                expect(await vsc.commands.executeCommand(generateDocstringCommand)).to.equal(true);
+                return document.getText().split('"""')[1];
+            };
+
+            expect(await generateFor()).not.to.contain("*args");
+
+            await settings.update("includeVariadicArgs", true, true);
+            try {
+                const docstring = await generateFor();
+                expect(docstring).to.contain("*args (_type_): _description_");
+                expect(docstring).to.contain("**kwargs (_type_): _description_");
+            } finally {
+                await settings.update("includeVariadicArgs", undefined, true);
+            }
+        });
+
         it("leaves no trailing whitespace when the cursor is indented on a blank line", async function () {
             const document = await vsc.workspace.openTextDocument({
                 language: "python",

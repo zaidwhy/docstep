@@ -281,9 +281,9 @@ function updateParams(
         const found = documented.get(param.name);
         if (found !== undefined) {
             entries.push(updateParamEntry(found.entry, found.head, param, options));
-        } else if (param.kind !== "variadic") {
+        } else if (param.kind !== "variadic" || options.includeVariadicArgs === true) {
             const type = options.includeTypes ? ` (${newParamType(param, options)})` : "";
-            entries.push({ lines: [`${indentation}${param.name}${type}: ${description(param)}`] });
+            entries.push({ lines: [`${indentation}${param.stars}${param.name}${type}: ${description(param)}`] });
         }
     }
 

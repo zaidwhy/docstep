@@ -202,8 +202,8 @@ function updateParams(
         const found = documented.get(param.name);
         if (found !== undefined) {
             entries.push(updateParamEntry(found.entry, found.head, param, options, base));
-        } else if (param.kind !== "variadic") {
-            let head = base + param.name;
+        } else if (param.kind !== "variadic" || options.includeVariadicArgs === true) {
+            let head = base + param.stars + param.name;
             if (options.includeTypes) {
                 head += ` : ${newParamType(param, options)}`;
             } else if (param.kind === "kwarg") {

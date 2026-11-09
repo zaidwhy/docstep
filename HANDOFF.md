@@ -19,7 +19,7 @@ Taken without Zaid on 2026-11-10 under the overnight directive. Each one is a si
 4. **No default keybinding for Update Docstring.** `cmd+shift+3` is the macOS screenshot shortcut, and no free chord is obviously right. Users bind `docstep.updateDocstring` themselves.
 5. **Defaults written in a description are left alone.** Only `_description_` placeholders get regenerated. Editing a sentence a person wrote is worse than leaving a stale default in it.
 6. **CI on Node 20 with stable VS Code.** Node 18 is past end of life, and insiders would make a red run ambiguous. `@vscode/test-electron` moved to 2.5.2 because 2.1.2 downloads from a CDN host that no longer resolves.
-7. **Not done: `*args` and `**kwargs` in Generate (#171).** It needs a change to all 11 templates and to Update's rule that never adds them. That is a format decision for Zaid, not a bug fix.
+7. **`*args` and `**kwargs` behind a setting (#171), reversible.** `docstep.includeVariadicArgs`, default off, so output is unchanged unless a user opts in. When on, Generate lists `*args` after the positional parameters and `**kwargs` last in all 11 templates, and Update adds them when missing (documented ones were always kept). To reverse: drop the setting and the `starArgs`/`starKwargs` blocks in the templates; nothing else depends on them.
 8. **Not done: "optional" for defaulted parameters (#228).** Napoleon's own examples write `(int, optional)` for a defaulted argument, so the current output is a style choice, not a bug.
 
 ## Waiting on Zaid (outward-facing, not decided overnight)

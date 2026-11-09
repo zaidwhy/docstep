@@ -15,6 +15,8 @@ export class TemplateData {
     public decorators: Decorator[];
     public args: Argument[];
     public kwargs: KeywordArgument[];
+    public starArgs: Argument[];
+    public starKwargs: Argument[];
     public exceptions: Exception[];
     public returns: Returns;
     public yields: Yields;
@@ -27,11 +29,14 @@ export class TemplateData {
         guessTypes: boolean,
         includeName: boolean,
         includeExtendedSummary: boolean,
+        includeVariadicArgs = false,
     ) {
         this.name = docstringParts.name;
         this.decorators = docstringParts.decorators;
         this.args = docstringParts.args;
         this.kwargs = docstringParts.kwargs;
+        this.starArgs = includeVariadicArgs ? (docstringParts.starArgs ?? []) : [];
+        this.starKwargs = includeVariadicArgs ? (docstringParts.starKwargs ?? []) : [];
         this.exceptions = docstringParts.exceptions;
         this.returns = docstringParts.returns;
         this.yields = docstringParts.yields;
@@ -80,15 +85,15 @@ export class TemplateData {
     }
 
     public argsExist(): boolean {
-        return this.args.length > 0;
+        return this.args.length > 0 || this.starArgs.length > 0;
     }
 
     public kwargsExist(): boolean {
-        return this.kwargs.length > 0;
+        return this.kwargs.length > 0 || this.starKwargs.length > 0;
     }
 
     public parametersExist(): boolean {
-        return this.args.length > 0 || this.kwargs.length > 0;
+        return this.argsExist() || this.kwargsExist();
     }
 
     public exceptionsExist(): boolean {
@@ -104,7 +109,7 @@ export class TemplateData {
     }
 
     private removeTypes(): void {
-        for (const arg of this.args) {
+        for (const arg of [...this.args, ...this.starArgs, ...this.starKwargs]) {
             arg.type = undefined;
         }
 
@@ -122,7 +127,7 @@ export class TemplateData {
     }
 
     private addDefaultTypePlaceholders(placeholder: string): void {
-        for (const arg of this.args) {
+        for (const arg of [...this.args, ...this.starArgs, ...this.starKwargs]) {
             if (arg.type === undefined) {
                 arg.type = placeholder;
             }

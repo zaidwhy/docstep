@@ -5,6 +5,10 @@ export interface DocstringParts {
     decorators: Decorator[];
     args: Argument[];
     kwargs: KeywordArgument[];
+    /** `*args`, with its stars in `var`. Rendered only when docstep.includeVariadicArgs is on. */
+    starArgs?: Argument[];
+    /** `**kwargs`, with its stars in `var`. Rendered only when docstep.includeVariadicArgs is on. */
+    starKwargs?: Argument[];
     exceptions: Exception[];
     returns: Returns;
     yields: Yields;

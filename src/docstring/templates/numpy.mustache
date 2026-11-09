@@ -10,10 +10,18 @@ Parameters
 {{var}} : {{typePlaceholder}}
     {{descriptionPlaceholder}}
 {{/args}}
+{{#starArgs}}
+{{var}} : {{typePlaceholder}}
+    {{descriptionPlaceholder}}
+{{/starArgs}}
 {{#kwargs}}
 {{var}} : {{typePlaceholder}}, optional
     {{descriptionPlaceholder}}, by default {{&default}}
 {{/kwargs}}
+{{#starKwargs}}
+{{var}} : {{typePlaceholder}}
+    {{descriptionPlaceholder}}
+{{/starKwargs}}
 {{/parametersExist}}
 {{#returnsExist}}
 

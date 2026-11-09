@@ -44,6 +44,8 @@ export interface FormatOptions {
     includeTypes: boolean;
     /** The docstep.guessTypes setting. When false, new entries get the _type_ placeholder. */
     guessTypes: boolean;
+    /** The docstep.includeVariadicArgs setting. When false, missing *args and **kwargs are not added. */
+    includeVariadicArgs?: boolean;
 }
 
 export const typePlaceholder = "_type_";

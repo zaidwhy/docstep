@@ -219,7 +219,8 @@ function updateParams(
     for (const param of params) {
         const paramField = paramFields.get(param.name);
         const typeField = typeFields.get(param.name);
-        if (paramField === undefined && typeField === undefined && param.kind === "variadic") {
+        const skipped = param.kind === "variadic" && options.includeVariadicArgs !== true;
+        if (paramField === undefined && typeField === undefined && skipped) {
             continue;
         }
         group.push(...paramGroup(param, paramField, typeField, options, base));
@@ -239,7 +240,7 @@ function paramGroup(
     base: string,
 ): Field[] {
     if (paramField === undefined) {
-        const created = makeField("param", `${base}:param ${param.name}: ${description(param)}`);
+        const created = makeField("param", `${base}:param ${param.stars}${param.name}: ${description(param)}`);
         const type = options.includeTypes ? newParamType(param, options) : undefined;
         return [created, ...typeFieldFor(param, typeField, type, options, base)];
     }
@@ -280,7 +281,7 @@ function typeFieldFor(
     base: string,
 ): Field[] {
     if (typeField === undefined) {
-        return newType === undefined ? [] : [makeField("type", `${base}:type ${param.name}: ${newType}`)];
+        return newType === undefined ? [] : [makeField("type", `${base}:type ${param.stars}${param.name}: ${newType}`)];
     }
     const existing = typeField.rest.trim();
     const type = typeField.lines.length === 1 ? reconcileParamType(existing, param, options) : existing;

@@ -52,7 +52,13 @@ function parseClass(document: string, positionLine: number, className: string): 
     if (init !== undefined) {
         const initDefinition = getDefinition(lines.join("\n"), init.headerEndLine + 1);
         const initParts = parseParameters(tokenizeDefinition(initDefinition), [], "__init__");
-        return { ...constructor, args: initParts.args, kwargs: initParts.kwargs };
+        return {
+            ...constructor,
+            args: initParts.args,
+            kwargs: initParts.kwargs,
+            starArgs: initParts.starArgs,
+            starKwargs: initParts.starKwargs,
+        };
     }
     if (isDataclass(lines, cls)) {
         const fields = dataclassFields(lines, cls);

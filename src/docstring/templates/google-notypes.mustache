@@ -8,9 +8,15 @@ Args:
 {{#args}}
     {{var}}: {{descriptionPlaceholder}}
 {{/args}}
+{{#starArgs}}
+    {{var}}: {{descriptionPlaceholder}}
+{{/starArgs}}
 {{#kwargs}}
     {{var}}: {{descriptionPlaceholder}}. Defaults to {{&default}}.
 {{/kwargs}}
+{{#starKwargs}}
+    {{var}}: {{descriptionPlaceholder}}
+{{/starKwargs}}
 {{/parametersExist}}
 {{#exceptionsExist}}
 

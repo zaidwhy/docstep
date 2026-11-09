@@ -17,6 +17,8 @@ export interface UpdateSettings {
     docstringFormat: string;
     customTemplatePath: string;
     guessTypes: boolean;
+    /** docstep.includeVariadicArgs: add missing *args and **kwargs. Off unless set. */
+    includeVariadicArgs?: boolean;
 }
 
 export type UpdateResult =
@@ -92,6 +94,7 @@ function update(document: string, cursorLine: number, settings: UpdateSettings):
     const options: FormatOptions = {
         includeTypes: family === format,
         guessTypes: settings.guessTypes,
+        includeVariadicArgs: settings.includeVariadicArgs === true,
     };
     const updated = updater(docstring.lines, signature, options, docstring.indentation);
 

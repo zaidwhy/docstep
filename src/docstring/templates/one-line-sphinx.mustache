@@ -6,9 +6,15 @@
 {{#args}}
 :param {{typePlaceholder}} {{var}}: {{descriptionPlaceholder}}
 {{/args}}
+{{#starArgs}}
+:param {{typePlaceholder}} {{var}}: {{descriptionPlaceholder}}
+{{/starArgs}}
 {{#kwargs}}
 :param {{typePlaceholder}} {{var}}: {{descriptionPlaceholder}}, defaults to {{&default}}
 {{/kwargs}}
+{{#starKwargs}}
+:param {{typePlaceholder}} {{var}}: {{descriptionPlaceholder}}
+{{/starKwargs}}
 {{#exceptions}}
 :raises {{type}}: {{descriptionPlaceholder}}
 {{/exceptions}}

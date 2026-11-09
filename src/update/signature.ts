@@ -1,4 +1,4 @@
-import { getBody, getDefinition, getFunctionName, parseParameters, tokenizeDefinition } from "../parse";
+import { getBody, getDefinition, getFunctionName, guessType, parseParameters, tokenizeDefinition } from "../parse";
 import { DocstringLocation, FunctionLocation } from "./locate";
 import { Signature, SignatureParam } from "./types";
 
@@ -30,7 +30,8 @@ export function readSignature(
         }
         const [, stars, name] = match;
         if (stars !== "") {
-            params.push({ name, stars, kind: "variadic" });
+            const annotation = /^\*{1,2}\w+\s*:/.test(token) ? guessType(token.slice(stars.length)) : undefined;
+            params.push({ name, stars, kind: "variadic", type: annotation, annotation });
             continue;
         }
 

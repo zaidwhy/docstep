@@ -35,10 +35,21 @@ describe("parseParameters()", () => {
                 { var: "param3", default: "1", type: "int" },
                 { var: "param4", default: "'abc'", type: "str" },
             ],
+            starArgs: [],
+            starKwargs: [],
             returns: { type: "int" },
             yields: undefined,
             exceptions: [{ type: "Exception" }, { type: "Exception2" }],
         });
+    });
+
+    it("should parse *args and **kwargs with their stars and skip a bare *", () => {
+        const parameterTokens = ["a", "*args: int", "*", "b=1", "**kwargs"];
+        const result = parseParameters(parameterTokens, [], "name");
+
+        expect(result.starArgs).to.eql([{ var: "*args", type: "int" }]);
+        expect(result.starKwargs).to.eql([{ var: "**kwargs", type: undefined }]);
+        expect(result.args).to.eql([{ var: "a", type: undefined }]);
     });
 
     it("should parse args with and without type hints", () => {
@@ -63,6 +74,8 @@ describe("parseParameters()", () => {
             name: "name",
             args: [{ var: "param1", type: `Literal["foo"]` }],
             kwargs: [{ var: "param2", default: `"bar"`, type: `Literal['bar']` }],
+            starArgs: [],
+            starKwargs: [],
             returns: { type: `Literal["baz"]` },
             decorators: [],
             exceptions: [],
