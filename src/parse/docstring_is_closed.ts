@@ -29,6 +29,9 @@ function quotesCloseExistingDocstring(
     let numberOfTripleQuotes = 0;
 
     for (const line of linesBeforePosition.reverse()) {
+        if (isComment(line)) {
+            continue;
+        }
         if (line.includes("def ") || line.includes("class ")) {
             break;
         }
@@ -54,6 +57,9 @@ function quotesOpenExistingDocstring(
     }
 
     for (const line of linesAfterPosition.slice(1)) {
+        if (isComment(line)) {
+            continue;
+        }
         // A line left of the docstring is outside the function, so its quotes are not ours.
         if (!blankLine(line) && indentationOf(line) < originalIndentation) {
             return false;
@@ -71,6 +77,10 @@ function quotesOpenExistingDocstring(
     }
 
     return false;
+}
+
+function isComment(line: string): boolean {
+    return line.trim().startsWith("#");
 }
 
 /** True when the first quotes on the line follow code that starts a string value. */

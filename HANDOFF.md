@@ -31,4 +31,4 @@ Taken without Zaid on 2026-11-10 under the overnight directive. Each one is a si
 
 ## Known gaps
 
-- The Enter/completion check (`src/parse/docstring_is_closed.ts`) decides from the text on each line, not from a tokenizer. Quotes inside a comment, or a closing line like `text = """` inside a docstring, can still mislead it.
+- The Enter/completion check (`src/parse/docstring_is_closed.ts`) decides from the text on each line, not from a tokenizer. Comment lines are skipped, but quotes after code on the same line (`x = 1  # """`) or docstring prose that reads like `text = """` can still mislead it.

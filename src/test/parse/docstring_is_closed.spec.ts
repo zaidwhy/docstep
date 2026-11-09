@@ -103,6 +103,28 @@ describe("docstringIsClosed()", () => {
 
         expect(docstringIsClosed(signUp, 1, 7, '"""')).to.equal(false);
     });
+
+    it("should ignore triple quotes in a comment below the cursor", () => {
+        const parse = [
+            "def parse(text):",
+            '    """',
+            '    # strips """ from the input',
+            "    return text",
+        ].join("\n");
+
+        expect(docstringIsClosed(parse, 1, 7, '"""')).to.equal(false);
+    });
+
+    it("should ignore triple quotes in a comment above the cursor", () => {
+        const parse = [
+            "def parse(text):",
+            '    # strips """ from the input',
+            '    """',
+            "    return text",
+        ].join("\n");
+
+        expect(docstringIsClosed(parse, 2, 7, '"""')).to.equal(false);
+    });
 });
 
 const closedDocstring = `
