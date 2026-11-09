@@ -1,6 +1,6 @@
 import * as vs from "vscode";
 import { AutoDocstring } from "./generate_docstring";
-import { docstringIsClosed, validDocstringPrefix } from "./parse";
+import { validEnterActivation } from "./enter_activation";
 import { extensionRoot, generateDocstringCommand, extensionID } from "./constants";
 import { getStackTrace } from "./telemetry";
 import { logInfo, logError } from "./logger";
@@ -32,7 +32,18 @@ export function activate(context: vs.ExtensionContext): void {
                 language,
                 {
                     provideCompletionItems: (document: vs.TextDocument, position: vs.Position) => {
-                        if (validEnterActivation(document, position)) {
+                        const enabled = vs.workspace
+                            .getConfiguration(extensionID)
+                            .get("generateDocstringOnEnter");
+                        if (
+                            validEnterActivation(
+                                document.getText(),
+                                position.line,
+                                position.character,
+                                getQuoteStyle(),
+                                enabled !== false,
+                            )
+                        ) {
                             return [new AutoDocstringCompletionItem(document, position)];
                         }
                     },
@@ -52,20 +63,6 @@ export function activate(context: vs.ExtensionContext): void {
  */
 export function deactivate() {
     return;
-}
-
-/**
- * Checks that the preceding characters of the position is a valid docstring prefix
- * and that the prefix is not part of an already closed docstring
- */
-function validEnterActivation(document: vs.TextDocument, position: vs.Position): boolean {
-    const docString = document.getText();
-    const quoteStyle = getQuoteStyle();
-
-    return (
-        validDocstringPrefix(docString, position.line, position.character, quoteStyle) &&
-        !docstringIsClosed(docString, position.line, position.character, quoteStyle)
-    );
 }
 
 /**
