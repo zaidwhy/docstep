@@ -59,6 +59,26 @@ describe("Basic Integration Tests", function () {
             expect(document.getText()).to.contain("_summary_");
         });
 
+        it("will activate the Generate Docstring completion item when the body holds a triple quoted string", async function () {
+            await editor.edit((edit) => edit.setEndOfLine(vsc.EndOfLine.LF));
+
+            await editor.edit((edit) => {
+                edit.insert(
+                    new vsc.Position(0, 0),
+                    'def greet(name):\n    """\n    text = """hello"""\n    return text',
+                );
+            });
+            editor.selection = new vsc.Selection(new vsc.Position(1, 7), new vsc.Position(1, 7));
+
+            await vsc.commands.executeCommand("editor.action.triggerSuggest");
+            await delay(200);
+            await vsc.commands.executeCommand("acceptSelectedSuggestion");
+            await delay(600);
+            // A plain word suggestion can also insert "_summary_"; only the generated docstring closes its quotes.
+            expect(document.getText().split('"""')).to.have.length(5);
+            expect(document.getText()).to.contain("_summary_");
+        });
+
         it("will activate the Generate Docstring completion item after triple single quotes", async function () {
             const settings = vsc.workspace.getConfiguration(settingsIdentifier);
             await settings.update("quoteStyle", "'''", true);

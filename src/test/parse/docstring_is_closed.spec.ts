@@ -66,6 +66,30 @@ describe("docstringIsClosed()", () => {
 
         expect(result).to.equal(false);
     });
+
+    it("should return false when the body holds a one line triple quoted string", () => {
+        const greeting = [
+            "def greet(name):",
+            '    """',
+            '    text = """hello"""',
+            "    return text",
+        ].join("\n");
+
+        expect(docstringIsClosed(greeting, 1, 7, '"""')).to.equal(false);
+    });
+
+    it("should return false when the body opens a multiline string after an assignment", () => {
+        const report = [
+            "def report(db):",
+            '    """',
+            '    query = """',
+            "    SELECT 1",
+            '    """',
+            "    return query",
+        ].join("\n");
+
+        expect(docstringIsClosed(report, 1, 7, '"""')).to.equal(false);
+    });
 });
 
 const closedDocstring = `

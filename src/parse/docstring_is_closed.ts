@@ -54,8 +54,11 @@ function quotesOpenExistingDocstring(
     }
 
     for (const line of linesAfterPosition.slice(1)) {
-        if (line.includes(quoteStyle)) {
-            return true;
+        const quotes = occurrences(line, quoteStyle);
+        // An even count is a string that opens and closes on its own line, and quotes after
+        // `=`, `(`, `,` or `return` open a new string; neither can close the docstring.
+        if (quotes % 2 === 1) {
+            return !opensString(line, quoteStyle);
         }
 
         if (
@@ -68,6 +71,12 @@ function quotesOpenExistingDocstring(
     }
 
     return false;
+}
+
+/** True when the first quotes on the line follow code that starts a string value. */
+function opensString(line: string, quoteStyle: string): boolean {
+    const before = line.slice(0, line.indexOf(quoteStyle)).replace(/[rRbBfFuU]{1,2}$/, "");
+    return /(?:[=(,[{:]|\breturn|\byield)\s*$/.test(before);
 }
 
 function sliceUpToPosition(lines: string[], linePosition: number, charPosition: number): string[] {

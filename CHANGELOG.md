@@ -11,6 +11,7 @@ Docstep is a maintained fork of [autoDocstring](https://github.com/NilsJPWerner/
 -   Fixed: docstring indented by the editor tab size instead of the function body ([upstream #315](https://github.com/NilsJPWerner/autoDocstring/issues/315))
 -   Fixed: a class docstring listed the base classes as arguments. It now documents the parameters of the class's own `__init__`, and none when the class has no `__init__` ([upstream #246](https://github.com/NilsJPWerner/autoDocstring/issues/246), part of [upstream #27](https://github.com/NilsJPWerner/autoDocstring/issues/27)).
 -   Fixed: a `@dataclass` got no parameters in its docstring. Generate and Update Docstring now document the fields its `__init__` takes ([upstream #170](https://github.com/NilsJPWerner/autoDocstring/issues/170)).
+-   Fixed: typing the opening quotes offered no docstring when the function body already held a triple quoted string, such as `x = """hello"""` ([upstream #68](https://github.com/NilsJPWerner/autoDocstring/issues/68)).
 -   Fixed: a module docstring generated at the top of a file was indented ([upstream #152](https://github.com/NilsJPWerner/autoDocstring/issues/152)).
 -   Fixed: CRLF newlines in templates were not condensed ([upstream PR #199](https://github.com/NilsJPWerner/autoDocstring/pull/199), @justinchuby)
 -   Fixed: definitions with PEP 695 type parameters, including `*Ts` and `**P` ([upstream PR #304](https://github.com/NilsJPWerner/autoDocstring/pull/304), @miminiao)
