@@ -15,7 +15,14 @@ export function getDocstringIndentation(
 
         if (!blankLine(currentLine)) {
             if (definitionPattern.test(currentLine)) {
-                return getIndentation(currentLine) + defaultIndentation;
+                const definitionIndentation = getIndentation(currentLine);
+                const bodyIndentation = getBodyIndentation(lines, linePosition);
+
+                if (bodyIndentation.length > definitionIndentation.length) {
+                    return bodyIndentation;
+                }
+
+                return definitionIndentation + defaultIndentation;
             }
         }
 
@@ -23,4 +30,24 @@ export function getDocstringIndentation(
     }
 
     return defaultIndentation;
+}
+
+/**
+ * Indentation of the first line of the body that follows the docstring position,
+ * skipping blank lines, comments and the opening quotes of the docstring itself.
+ * Returns "" if there is no such line.
+ */
+function getBodyIndentation(lines: string[], linePosition: number): string {
+    for (let lineNum = linePosition; lineNum < lines.length; lineNum++) {
+        const line = lines[lineNum];
+        const content = line.trim();
+
+        if (blankLine(line) || content.startsWith("#") || /^("""|''')/.test(content)) {
+            continue;
+        }
+
+        return getIndentation(line);
+    }
+
+    return "";
 }
