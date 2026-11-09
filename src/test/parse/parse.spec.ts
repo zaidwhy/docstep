@@ -30,9 +30,25 @@ describe("parse() on a class", () => {
     });
 
     it("should have no arguments when the class has no __init__", () => {
-        const document = ["@dataclass", "class Point(Base):", "", "    x: int"].join("\n");
+        const document = ["@register", "class Point(Base):", "", "    x: int"].join("\n");
 
         expect(parse(document, 2).args).to.deep.equal([]);
+    });
+
+    it("should take the arguments of a dataclass from its fields", () => {
+        const document = [
+            "@dataclass",
+            "class Point:",
+            "",
+            "    x: int",
+            "    y: float = 0.5",
+            "    count: ClassVar[int] = 0",
+        ].join("\n");
+
+        const parts = parse(document, 2);
+
+        expect(parts.args).to.deep.equal([{ var: "x", type: "int" }]);
+        expect(parts.kwargs).to.deep.equal([{ var: "y", default: "0.5", type: "float" }]);
     });
 
     it("should leave function parsing unchanged", () => {

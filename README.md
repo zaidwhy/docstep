@@ -1,6 +1,6 @@
 # Docstep
 
-Docstep is a VS Code extension that generates Python docstrings from a function or class signature, in Google, NumPy, Sphinx, PEP 257, docBlockr, doxygen or a custom mustache template. It is a maintained fork of [autoDocstring](https://github.com/NilsJPWerner/autoDocstring) by Nils Werner, whose last release was 0.6.1 in February 2022. On top of upstream it fixes docstrings indented to the editor tab size instead of the function body ([#315](https://github.com/NilsJPWerner/autoDocstring/issues/315)), the ignored `generateDocstringOnEnter` setting ([#312](https://github.com/NilsJPWerner/autoDocstring/issues/312)), class docstrings that listed the base classes as arguments instead of the `__init__` parameters, CRLF templates, and functions and classes with PEP 695 type parameters. It also adds an [Update Docstring](#updating-a-docstring) command that brings an existing docstring in line with a changed signature, the most requested autoDocstring feature. The full list is in the [CHANGELOG](CHANGELOG.md).
+Docstep is a VS Code extension that generates Python docstrings from a function or class signature, in Google, NumPy, Sphinx, PEP 257, docBlockr, doxygen or a custom mustache template. It is a maintained fork of [autoDocstring](https://github.com/NilsJPWerner/autoDocstring) by Nils Werner, whose last release was 0.6.1 in February 2022. On top of upstream it fixes docstrings indented to the editor tab size instead of the function body ([#315](https://github.com/NilsJPWerner/autoDocstring/issues/315)), the ignored `generateDocstringOnEnter` setting ([#312](https://github.com/NilsJPWerner/autoDocstring/issues/312)), class docstrings that listed the base classes as arguments instead of the `__init__` parameters or dataclass fields, indented module docstrings, CRLF templates, and functions and classes with PEP 695 type parameters. It also adds an [Update Docstring](#updating-a-docstring) command that brings an existing docstring in line with a changed signature, the most requested autoDocstring feature. The full list is in the [CHANGELOG](CHANGELOG.md).
 
 ![Generating a docstring](images/demo.gif)
 
@@ -85,7 +85,7 @@ def fetch(url: str, timeout: float = 5.0) -> bytes:
 
 It works with the `google`, `numpy` and `sphinx` formats and their `-notypes` variants, read from `docstep.docstringFormat`.
 
-On a class, with the cursor on the `class` line, one of its decorators or inside its docstring, the command matches the class docstring's parameters to the class's own `__init__`, as the Google and NumPy style guides allow. Base classes are never treated as parameters, and what `__init__` returns or raises stays in the `__init__` docstring. With the cursor inside `__init__`, the `__init__` docstring is updated instead.
+On a class, with the cursor on the `class` line, one of its decorators or inside its docstring, the command matches the class docstring's parameters to the class's own `__init__`, as the Google and NumPy style guides allow. Base classes are never treated as parameters, and what `__init__` returns or raises stays in the `__init__` docstring. A `@dataclass` without its own `__init__` is documented from the fields its generated `__init__` takes: `ClassVar` fields, `field(init=False)` and the `KW_ONLY` marker are left out, `InitVar` fields are kept, and a `default_factory` shows as `list()` and so on. Fields inherited from a base dataclass are not seen. With the cursor inside `__init__`, the `__init__` docstring is updated instead. Generate Docstring follows the same rules for a new class docstring.
 
 | What | Rule |
 | --- | --- |
@@ -108,7 +108,7 @@ Docstep makes no edit, and says why, when it cannot read the docstring with conf
 -   mixed CRLF and LF line endings inside the docstring
 -   `docstep.docstringFormat` is not google, numpy or sphinx (the message names it), or `docstep.customTemplatePath` is set
 -   the cursor is not on a `def` line, inside a function, or on a class header or class docstring, or the body is on the same line as the `def` or `class`
--   the class has no `__init__` of its own, such as a dataclass or a class that inherits its constructor
+-   the class has no `__init__` of its own and is not a dataclass, such as a class that inherits its constructor
 -   the cursor is on a decorator that decorates neither a function nor a class
 
 ## Extension Settings

@@ -218,6 +218,17 @@ describe("Basic Integration Tests", function () {
     });
 
     describe("Class Docstring Generation", function () {
+        it("documents the fields of a dataclass", async function () {
+            await testDocstringGeneration({
+                expectedOutputFilePath: path.resolve(
+                    __dirname,
+                    "./python_test_files/file_dataclass_output.py",
+                ),
+                inputFilePath: path.resolve(__dirname, "./python_test_files/file_dataclass.py"),
+                position: new vsc.Position(2, 0),
+            });
+        });
+
         it("documents the __init__ parameters, not the base classes", async function () {
             await testDocstringGeneration({
                 expectedOutputFilePath: path.resolve(

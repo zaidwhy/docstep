@@ -141,7 +141,7 @@ function docstringEnd(lines: string[], cls: FunctionLocation): number {
 }
 
 /** The __init__ defined directly in the class body, whose parameters the class docstring documents. */
-export function locateInit(lines: string[], cls: FunctionLocation): FunctionLocation {
+export function locateInit(lines: string[], cls: FunctionLocation): FunctionLocation | undefined {
     const end = bodyEnd(lines, cls.defLine, cls.headerEndLine);
     let bodyIndentation: number | undefined;
     for (let line = cls.headerEndLine + 1; line <= end; line++) {
@@ -169,13 +169,11 @@ export function locateInit(lines: string[], cls: FunctionLocation): FunctionLoca
         }
         line = statementEnd(lines, line);
     }
-    throw new UpdateRefusal(
-        `"${cls.name}" has no __init__. Update Docstring fills a class docstring from the __init__ parameters.`,
-    );
+    return undefined;
 }
 
 /** Last line of the statement starting at `start`, following open brackets across lines. */
-function statementEnd(lines: string[], start: number): number {
+export function statementEnd(lines: string[], start: number): number {
     let depth = 0;
     let quote: string | undefined;
     for (let lineNumber = start; lineNumber < lines.length; lineNumber++) {
@@ -265,7 +263,7 @@ function findHeaderEnd(
  * Walks whole statements, so string, bracket and backslash continuations and comments
  * may sit at any indentation without ending the function.
  */
-function bodyEnd(lines: string[], defLine: number, headerEndLine: number): number {
+export function bodyEnd(lines: string[], defLine: number, headerEndLine: number): number {
     const defIndentation = indentationOf(lines[defLine]).length;
     let end = headerEndLine;
     for (let line = headerEndLine + 1; line < lines.length; line++) {

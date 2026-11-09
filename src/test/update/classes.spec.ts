@@ -84,12 +84,13 @@ describe("updateDocstring() on a class", () => {
     });
 
     it("should refuse a class without __init__", () => {
-        const source = py("@dataclass", "class Point:", '    """A point."""', "    x: int");
+        const source = py("@register", "class Point:", '    """A point."""', "    x: int");
         const result = run("google", source, 0);
 
         expect(result.kind).to.equal("refused");
         expect(result.kind === "refused" ? result.message : "").to.equal(
-            '"Point" has no __init__. Update Docstring fills a class docstring from the __init__ parameters.',
+            '"Point" has no __init__ and is not a dataclass. Update Docstring fills a class docstring ' +
+                "from the __init__ parameters or the dataclass fields.",
         );
     });
 

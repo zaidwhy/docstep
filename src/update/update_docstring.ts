@@ -1,10 +1,17 @@
 import { arraysEqual } from "./lines";
-import { DocstringLocation, locateDocstring, locateFunction, locateInit } from "./locate";
+import { dataclassFields, isDataclass } from "./dataclass";
+import {
+    DocstringLocation,
+    FunctionLocation,
+    locateDocstring,
+    locateFunction,
+    locateInit,
+} from "./locate";
 import { readSignature } from "./signature";
 import { updateGoogle } from "./google";
 import { updateNumpy } from "./numpy";
 import { updateSphinx } from "./sphinx";
-import { FormatOptions, Signature, UpdateRefusal } from "./types";
+import { FormatOptions, Signature, SignatureParam, UpdateRefusal } from "./types";
 
 export interface UpdateSettings {
     docstringFormat: string;
@@ -80,7 +87,7 @@ function update(document: string, cursorLine: number, settings: UpdateSettings):
 
     const signature =
         fn.kind === "class"
-            ? classSignature(readSignature(lines, locateInit(lines, fn), docstring))
+            ? classSignature(lines, fn, docstring)
             : readSignature(lines, fn, docstring);
     const options: FormatOptions = {
         includeTypes: family === format,
@@ -105,9 +112,44 @@ function update(document: string, cursorLine: number, settings: UpdateSettings):
     };
 }
 
-/** A class docstring documents the constructor's parameters; what __init__ returns or raises stays in __init__. */
-function classSignature(init: Signature): Signature {
-    return { params: init.params, exceptions: [] };
+/**
+ * A class docstring documents the constructor's parameters: those of its own __init__, or the
+ * fields of a dataclass. What __init__ returns or raises stays in the __init__ docstring.
+ */
+function classSignature(
+    lines: string[],
+    cls: FunctionLocation,
+    docstring: DocstringLocation,
+): Signature {
+    const init = locateInit(lines, cls);
+    if (init !== undefined) {
+        return { params: readSignature(lines, init, docstring).params, exceptions: [] };
+    }
+    if (isDataclass(lines, cls)) {
+        const params = dataclassFields(lines, cls).map((field): SignatureParam =>
+            field.default === undefined
+                ? {
+                      name: field.name,
+                      stars: "",
+                      kind: "arg",
+                      type: field.annotation,
+                      annotation: field.annotation,
+                  }
+                : {
+                      name: field.name,
+                      stars: "",
+                      kind: "kwarg",
+                      type: field.annotation,
+                      annotation: field.annotation,
+                      default: field.default,
+                  },
+        );
+        return { params, exceptions: [] };
+    }
+    throw new UpdateRefusal(
+        `"${cls.name}" has no __init__ and is not a dataclass. Update Docstring fills a class docstring ` +
+            "from the __init__ parameters or the dataclass fields.",
+    );
 }
 
 /** The docstring's own line ending. Mixed endings inside the docstring are refused. */
