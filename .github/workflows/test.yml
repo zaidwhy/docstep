@@ -32,6 +32,7 @@ jobs:
                   node-version: 20
                   cache: "npm"
             - run: npm install
+            - run: npm run lint
             - run: npm run prepare_integration_tests
             # Stable, not insiders, so a red run means our change and not a nightly build.
             - run: xvfb-run -a npm run integration_test
