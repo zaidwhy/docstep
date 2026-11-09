@@ -28,6 +28,8 @@ const defPattern = /^\s*(?:async\s+)?def\s+([A-Za-z_]\w*)/;
 
 /** Finds the innermost function whose def header or body contains `cursorLine`. */
 export function locateFunction(lines: string[], cursorLine: number): FunctionLocation {
+    // A cursor on a decorator means the function it decorates, never the one around it.
+    cursorLine = decoratedDefLine(lines, Math.min(cursorLine, lines.length - 1)) ?? cursorLine;
     for (let line = Math.min(cursorLine, lines.length - 1); line >= 0; line--) {
         const match = lines[line].match(defPattern);
         if (match == null) {
@@ -54,6 +56,86 @@ export function locateFunction(lines: string[], cursorLine: number): FunctionLoc
     throw new UpdateRefusal(
         "Put the cursor on a def line or inside a function body, then run Update Docstring.",
     );
+}
+
+const decoratorPattern = /^\s*@/;
+
+/**
+ * When `cursorLine` sits inside a decorator, returns the def line that decorator applies to.
+ * Returns undefined when the cursor is not in a decorator; refuses when a decorator decorates no def.
+ */
+function decoratedDefLine(lines: string[], cursorLine: number): number | undefined {
+    let decoratorStart: number | undefined;
+    for (let line = cursorLine; line >= 0; line--) {
+        if (decoratorPattern.test(lines[line])) {
+            if (statementEnd(lines, line) >= cursorLine) {
+                decoratorStart = line;
+            }
+            break;
+        }
+        if (line !== cursorLine && !isBlank(lines[line]) && indentationOf(lines[line]).length <= indentationOf(lines[cursorLine]).length) {
+            break;
+        }
+    }
+    if (decoratorStart === undefined) {
+        return undefined;
+    }
+
+    const indentation = indentationOf(lines[decoratorStart]).length;
+    for (let line = statementEnd(lines, decoratorStart) + 1; line < lines.length; line++) {
+        const text = lines[line];
+        if (isBlank(text) || text.trim().startsWith("#")) {
+            continue;
+        }
+        if (decoratorPattern.test(text) && indentationOf(text).length === indentation) {
+            line = statementEnd(lines, line);
+            continue;
+        }
+        if (defPattern.test(text) && indentationOf(text).length === indentation) {
+            return line;
+        }
+        break;
+    }
+    throw new UpdateRefusal("The decorator under the cursor does not decorate a function.");
+}
+
+/** Last line of the statement starting at `start`, following open brackets across lines. */
+function statementEnd(lines: string[], start: number): number {
+    let depth = 0;
+    let quote: string | undefined;
+    for (let lineNumber = start; lineNumber < lines.length; lineNumber++) {
+        const line = lines[lineNumber];
+        for (let index = 0; index < line.length; index++) {
+            const char = line[index];
+            if (quote !== undefined) {
+                if (char === "\\") {
+                    index++;
+                } else if (line.startsWith(quote, index)) {
+                    index += quote.length - 1;
+                    quote = undefined;
+                }
+                continue;
+            }
+            if (char === "#") {
+                break;
+            }
+            if (char === '"' || char === "'") {
+                quote = line.startsWith(char.repeat(3), index) ? char.repeat(3) : char;
+                index += quote.length - 1;
+            } else if ("([{".includes(char)) {
+                depth++;
+            } else if (")]}".includes(char)) {
+                depth--;
+            }
+        }
+        if (quote !== undefined && quote.length === 1) {
+            quote = undefined;
+        }
+        if (depth <= 0 && quote === undefined) {
+            return lineNumber;
+        }
+    }
+    return lines.length - 1;
 }
 
 /** Line of the colon that closes the def header, skipping brackets, strings and comments. */

@@ -48,7 +48,7 @@ Cursor must be on the line directly below the definition to generate full auto-p
 
 ## Updating a docstring
 
-When a signature changes, run `Docstep: Update Docstring` from the command palette with the cursor on the `def` line or anywhere inside the function, including its docstring. Docstep rewrites the docstring to match the signature and keeps what you wrote. It only edits when you run the command, never on save or while typing, and the whole change is one edit, so a single undo reverts it. The command has no default keybinding; bind `docstep.updateDocstring` in Preferences -> Keyboard Shortcuts if you want one.
+When a signature changes, run `Docstep: Update Docstring` from the command palette with the cursor on the `def` line, on one of its decorators, or anywhere inside the function, including its docstring. Docstep rewrites the docstring to match the signature and keeps what you wrote. It only edits when you run the command, never on save or while typing, and the whole change is one edit, so a single undo reverts it. The command has no default keybinding; bind `docstep.updateDocstring` in Preferences -> Keyboard Shortcuts if you want one.
 
 Before, after adding `timeout` and removing `retries`:
 
@@ -106,6 +106,7 @@ Docstep makes no edit, and says why, when it cannot read the docstring with conf
 -   mixed CRLF and LF line endings inside the docstring
 -   `docstep.docstringFormat` is not google, numpy or sphinx (the message names it), or `docstep.customTemplatePath` is set
 -   the cursor is not on a `def` line or inside a function, or the function body is on the `def` line
+-   the cursor is on a decorator that decorates a class rather than a function
 
 ## Extension Settings
 
