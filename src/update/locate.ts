@@ -148,6 +148,8 @@ function docstringEnd(lines: string[], cls: FunctionLocation): number {
 export function locateInit(lines: string[], cls: FunctionLocation): FunctionLocation | undefined {
     const end = bodyEnd(lines, cls.defLine, cls.headerEndLine);
     let bodyIndentation: number | undefined;
+    // The last __init__ wins at runtime; earlier ones are @overload stubs or dead code.
+    let init: { location: FunctionLocation; bodyOnSameLine: boolean } | undefined;
     for (let line = cls.headerEndLine + 1; line <= end; line++) {
         const text = lines[line];
         if (isBlank(text) || text.trim().startsWith("#")) {
@@ -164,16 +166,26 @@ export function locateInit(lines: string[], cls: FunctionLocation): FunctionLoca
                     `Could not find the end of the def header of "${cls.name}.__init__".`,
                 );
             }
-            return {
-                kind: "function",
-                defLine: line,
-                headerEndLine: header.line,
-                name: "__init__",
+            init = {
+                location: {
+                    kind: "function",
+                    defLine: line,
+                    headerEndLine: header.line,
+                    name: "__init__",
+                },
+                bodyOnSameLine: header.bodyOnSameLine,
             };
+            line = header.line;
+            continue;
         }
         line = statementEnd(lines, line);
     }
-    return undefined;
+    if (init?.bodyOnSameLine === true) {
+        throw new UpdateRefusal(
+            `The body of "${cls.name}.__init__" is on the same line as the def. Move it to its own line first.`,
+        );
+    }
+    return init?.location;
 }
 
 /** Lines that start inside a triple-quoted string, where a `def` is text and not code. */

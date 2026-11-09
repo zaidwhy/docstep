@@ -27,7 +27,8 @@ export function isDataclass(lines: string[], cls: FunctionLocation): boolean {
             return false;
         }
         if (dataclassDecorator.test(trimmed)) {
-            return true;
+            // init=False means no generated __init__, so the fields are not parameters.
+            return !/\binit\s*=\s*False\b/.test(trimmed);
         }
         // Another decorator, or the closing bracket of a multi-line one.
         if (!trimmed.startsWith("@") && !/^[)\]}]/.test(trimmed)) {
@@ -56,7 +57,7 @@ export function dataclassFields(lines: string[], cls: FunctionLocation): Datacla
         if (indentationOf(text).length === bodyIndentation) {
             const statement = lines
                 .slice(line, statementLast + 1)
-                .map((part) => part.trim())
+                .map((part) => withoutComment(part).trim())
                 .join(" ");
             const field = readField(statement);
             if (field !== undefined) {
@@ -69,7 +70,7 @@ export function dataclassFields(lines: string[], cls: FunctionLocation): Datacla
 }
 
 function readField(statement: string): DataclassField | undefined {
-    const match = statement.replace(/\s+#.*$/, "").match(fieldPattern);
+    const match = statement.match(fieldPattern);
     if (match == null) {
         return undefined;
     }
@@ -102,6 +103,26 @@ function readField(statement: string): DataclassField | undefined {
     const fieldDefault =
         keywords.get("default") ?? (factory === undefined ? undefined : `${factory}()`);
     return { name: match[1], annotation, default: fieldDefault };
+}
+
+/** The line up to a `#` that is outside any string. */
+function withoutComment(line: string): string {
+    let quote: string | undefined;
+    for (let index = 0; index < line.length; index++) {
+        const char = line[index];
+        if (quote !== undefined) {
+            if (char === "\\") {
+                index++;
+            } else if (char === quote) {
+                quote = undefined;
+            }
+        } else if (char === '"' || char === "'") {
+            quote = char;
+        } else if (char === "#") {
+            return line.slice(0, index);
+        }
+    }
+    return line;
 }
 
 /** Keyword arguments of a call, split at top-level commas. */

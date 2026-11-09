@@ -38,8 +38,10 @@ function parseClass(document: string, positionLine: number, className: string): 
         .split("\n")
         .map((line, index) => (index === positionLine ? "" : line.replace(/\r$/, "")));
     let cls: FunctionLocation;
+    let init: FunctionLocation | undefined;
     try {
         cls = locateFunction(lines, positionLine - 1);
+        init = locateInit(lines, cls);
     } catch (error) {
         if (error instanceof UpdateRefusal) {
             return constructor;
@@ -47,7 +49,6 @@ function parseClass(document: string, positionLine: number, className: string): 
         throw error;
     }
 
-    const init = locateInit(lines, cls);
     if (init !== undefined) {
         const initDefinition = getDefinition(lines.join("\n"), init.headerEndLine + 1);
         const initParts = parseParameters(tokenizeDefinition(initDefinition), [], "__init__");

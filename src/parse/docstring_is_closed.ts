@@ -83,10 +83,25 @@ function isComment(line: string): boolean {
     return line.trim().startsWith("#");
 }
 
-/** True when the first quotes on the line follow code that starts a string value. */
+/**
+ * True when the first quotes on the line follow code that starts a string value: an
+ * assignment, a bare return or yield, or an argument inside a bracket still open on the line.
+ * Prose closing a docstring ("the value to return""") matches none of these from the line start.
+ */
 function opensString(line: string, quoteStyle: string): boolean {
-    const before = line.slice(0, line.indexOf(quoteStyle)).replace(/[rRbBfFuU]{1,2}$/, "");
-    return /(?:[=(,[{:]|\breturn|\byield)\s*$/.test(before);
+    const before = line
+        .slice(0, line.indexOf(quoteStyle))
+        .replace(/[rRbBfFuU]{1,2}$/, "")
+        .trim();
+    if (/^(?:return|yield)$/.test(before)) {
+        return true;
+    }
+    if (/^[A-Za-z_][\w.]*(?:\[[^\]]*\])?\s*(?::[^=]+)?[-+*/|&]?=$/.test(before)) {
+        return true;
+    }
+    const opened = (before.match(/[([{]/g) ?? []).length;
+    const closed = (before.match(/[)\]}]/g) ?? []).length;
+    return /[([{,]$/.test(before) && opened > closed;
 }
 
 function sliceUpToPosition(lines: string[], linePosition: number, charPosition: number): string[] {

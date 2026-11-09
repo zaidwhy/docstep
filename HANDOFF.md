@@ -32,3 +32,4 @@ Taken without Zaid on 2026-11-10 under the overnight directive. Each one is a si
 ## Known gaps
 
 - The Enter/completion check (`src/parse/docstring_is_closed.ts`) decides from the text on each line, not from a tokenizer. Comment lines are skipped, but quotes after code on the same line (`x = 1  # """`) or docstring prose that reads like `text = """` can still mislead it.
+- The integration suite failed once in five local runs (2026-11-10) and the failing test was not captured. The completion tests wait a fixed 200 ms for suggestions, which is the likely source. If CI goes red without a code reason, check those first.
