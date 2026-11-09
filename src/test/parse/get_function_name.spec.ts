@@ -20,4 +20,11 @@ describe("getFunctionName()", () => {
 
         expect(result).to.eql("Func1");
     });
+
+    it("should get the function name from a generic function (PEP 695)", () => {
+        const functionDefinition = "def first[T](items: list[T]) -> T:";
+        const result = getFunctionName(functionDefinition);
+
+        expect(result).to.eql("first");
+    });
 });

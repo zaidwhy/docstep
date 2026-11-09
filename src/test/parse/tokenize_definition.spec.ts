@@ -113,4 +113,27 @@ describe("tokenizeDefinition()", () => {
 
         expect(result).to.have.ordered.members(["arg", "arg_2"]);
     });
+
+    describe("with PEP 695 type parameters", () => {
+        it("should tokenize a generic function", () => {
+            const functionDefinition = "def first[T](items: list[T]) -> T:";
+            const result = tokenizeDefinition(functionDefinition);
+
+            expect(result).to.have.ordered.members(["items:list[T]", "-> T"]);
+        });
+
+        it("should tokenize a generic function with a constrained type parameter", () => {
+            const functionDefinition = "def clamp[N: (int, float)](value: N, low: N = 0) -> N:";
+            const result = tokenizeDefinition(functionDefinition);
+
+            expect(result).to.have.ordered.members(["value:N", "low:N=0", "-> N"]);
+        });
+
+        it("should tokenize a generic class", () => {
+            const functionDefinition = "class Box[T](Generic):";
+            const result = tokenizeDefinition(functionDefinition);
+
+            expect(result).to.have.ordered.members(["Generic"]);
+        });
+    });
 });
