@@ -272,6 +272,32 @@ describe("Basic Integration Tests", function () {
         });
     });
 
+    describe("Jupyter Notebook", function () {
+        it("generates a docstring inside a notebook code cell", async function () {
+            const notebook = await vsc.workspace.openNotebookDocument(
+                "jupyter-notebook",
+                new vsc.NotebookData([
+                    new vsc.NotebookCellData(
+                        vsc.NotebookCellKind.Code,
+                        "def pick(mode: int):\n\n    return mode",
+                        "python",
+                    ),
+                ]),
+            );
+            await vsc.window.showNotebookDocument(notebook, {
+                selections: [new vsc.NotebookRange(0, 1)],
+            });
+            await vsc.commands.executeCommand("notebook.cell.edit");
+            await delay(300);
+            const editor = vsc.window.activeTextEditor;
+            expect(editor.document.uri.scheme).to.equal("vscode-notebook-cell");
+            editor.selection = new vsc.Selection(new vsc.Position(1, 0), new vsc.Position(1, 0));
+
+            expect(await vsc.commands.executeCommand(generateDocstringCommand)).to.equal(true);
+            expect(notebook.cellAt(0).document.getText()).to.contain(":param mode:");
+        });
+    });
+
     describe("Module Docstring Generation", function () {
         it("does not indent a module docstring", async function () {
             await testDocstringGeneration({

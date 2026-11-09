@@ -46,6 +46,8 @@ Cursor must be on the line directly below the definition to generate full auto-p
 -   Command: `Generate Docstring`
 -   Right click menu: `Generate Docstring`
 
+It works in `.py` files and in the code cells of a Jupyter notebook.
+
 ## Updating a docstring
 
 When a signature changes, run `Docstep: Update Docstring` from the command palette with the cursor on the `def` line, on one of its decorators, or anywhere inside the function, including its docstring. Docstep rewrites the docstring to match the signature and keeps what you wrote. It only edits when you run the command, never on save or while typing, and the whole change is one edit, so a single undo reverts it. The command has no default keybinding; bind `docstep.updateDocstring` in Preferences -> Keyboard Shortcuts if you want one.
