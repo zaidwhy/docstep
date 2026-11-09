@@ -284,9 +284,7 @@ describe("Basic Integration Tests", function () {
                     ),
                 ]),
             );
-            await vsc.window.showNotebookDocument(notebook, {
-                selections: [new vsc.NotebookRange(0, 1)],
-            });
+            await vsc.commands.executeCommand("vscode.open", notebook.uri);
             await vsc.commands.executeCommand("notebook.cell.edit");
             await delay(300);
             const editor = vsc.window.activeTextEditor;
