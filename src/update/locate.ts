@@ -105,6 +105,7 @@ function statementEnd(lines: string[], start: number): number {
     let quote: string | undefined;
     for (let lineNumber = start; lineNumber < lines.length; lineNumber++) {
         const line = lines[lineNumber];
+        let continued = false;
         for (let index = 0; index < line.length; index++) {
             const char = line[index];
             if (quote !== undefined) {
@@ -119,7 +120,9 @@ function statementEnd(lines: string[], start: number): number {
             if (char === "#") {
                 break;
             }
-            if (char === '"' || char === "'") {
+            if (char === "\\") {
+                continued = index === line.trimEnd().length - 1;
+            } else if (char === '"' || char === "'") {
                 quote = line.startsWith(char.repeat(3), index) ? char.repeat(3) : char;
                 index += quote.length - 1;
             } else if ("([{".includes(char)) {
@@ -131,7 +134,7 @@ function statementEnd(lines: string[], start: number): number {
         if (quote !== undefined && quote.length === 1) {
             quote = undefined;
         }
-        if (depth <= 0 && quote === undefined) {
+        if (depth <= 0 && quote === undefined && !continued) {
             return lineNumber;
         }
     }
@@ -179,18 +182,23 @@ function findHeaderEnd(lines: string[], defLine: number): { line: number; bodyOn
     return undefined;
 }
 
-/** Last line of the function: the last non-blank line indented deeper than the def. */
+/**
+ * Last line of the function: the end of the last statement that starts deeper than the def.
+ * Walks whole statements, so string, bracket and backslash continuations and comments
+ * may sit at any indentation without ending the function.
+ */
 function bodyEnd(lines: string[], defLine: number, headerEndLine: number): number {
     const defIndentation = indentationOf(lines[defLine]).length;
     let end = headerEndLine;
     for (let line = headerEndLine + 1; line < lines.length; line++) {
-        if (isBlank(lines[line])) {
+        if (isBlank(lines[line]) || lines[line].trim().startsWith("#")) {
             continue;
         }
         if (indentationOf(lines[line]).length <= defIndentation) {
             break;
         }
-        end = line;
+        end = statementEnd(lines, line);
+        line = end;
     }
     return end;
 }
