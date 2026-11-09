@@ -1,13 +1,53 @@
 import { getBody, getDefinition, getFunctionName, parseParameters, tokenizeDefinition } from ".";
 import { DocstringParts } from "../docstring_parts";
+import { FunctionLocation, locateFunction, locateInit } from "../update/locate";
+import { UpdateRefusal } from "../update/types";
 
 export function parse(document: string, positionLine: number): DocstringParts {
     const definition = getDefinition(document, positionLine);
-    const body = getBody(document, positionLine);
-
-    const parameterTokens = tokenizeDefinition(definition);
     const functionName = getFunctionName(definition);
 
-    const docstringParts = parseParameters(parameterTokens, body, functionName);
-    return docstringParts;
+    if (/^class\b/.test(definition)) {
+        return parseClass(document, positionLine, functionName);
+    }
+
+    const body = getBody(document, positionLine);
+    const parameterTokens = tokenizeDefinition(definition);
+    return parseParameters(parameterTokens, body, functionName);
+}
+
+/**
+ * A class docstring documents the constructor, so its arguments come from the class's own
+ * __init__, never from the base classes in the class header. What __init__ returns or raises
+ * belongs in the __init__ docstring.
+ */
+function parseClass(document: string, positionLine: number, className: string): DocstringParts {
+    const constructor: DocstringParts = {
+        name: className,
+        decorators: [],
+        args: [],
+        kwargs: [],
+        exceptions: [],
+        returns: undefined,
+        yields: undefined,
+    };
+
+    // The line being documented may hold an unclosed """ that would swallow the class body.
+    const lines = document
+        .split("\n")
+        .map((line, index) => (index === positionLine ? "" : line.replace(/\r$/, "")));
+    let init: FunctionLocation;
+    try {
+        init = locateInit(lines, locateFunction(lines, positionLine - 1));
+    } catch (error) {
+        if (error instanceof UpdateRefusal) {
+            return constructor;
+        }
+        throw error;
+    }
+
+    const blanked = lines.join("\n");
+    const initDefinition = getDefinition(blanked, init.headerEndLine + 1);
+    const initParts = parseParameters(tokenizeDefinition(initDefinition), [], "__init__");
+    return { ...constructor, args: initParts.args, kwargs: initParts.kwargs };
 }

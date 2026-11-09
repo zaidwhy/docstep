@@ -1,0 +1,43 @@
+import * as chai from "chai";
+import "mocha";
+
+import { parse } from "../../parse";
+
+chai.config.truncateThreshold = 0;
+const expect = chai.expect;
+
+describe("parse() on a class", () => {
+    it("should take the arguments from __init__, not the base classes", () => {
+        const document = [
+            "class Shop(Base, Mixin):",
+            '    """',
+            "",
+            "    def __init__(self, name: str, size=3):",
+            "        if size < 0:",
+            "            raise ValueError(size)",
+            "",
+            "    def total(self):",
+            "        return 1",
+        ].join("\n");
+
+        const parts = parse(document, 1);
+
+        expect(parts.name).to.equal("Shop");
+        expect(parts.args).to.deep.equal([{ var: "name", type: "str" }]);
+        expect(parts.kwargs).to.deep.equal([{ var: "size", default: "3", type: "int" }]);
+        expect(parts.exceptions).to.deep.equal([]);
+        expect(parts.returns).to.equal(undefined);
+    });
+
+    it("should have no arguments when the class has no __init__", () => {
+        const document = ["@dataclass", "class Point(Base):", "", "    x: int"].join("\n");
+
+        expect(parse(document, 2).args).to.deep.equal([]);
+    });
+
+    it("should leave function parsing unchanged", () => {
+        const document = ["def fetch(url: str):", "", "    return url"].join("\n");
+
+        expect(parse(document, 1).args).to.deep.equal([{ var: "url", type: "str" }]);
+    });
+});
