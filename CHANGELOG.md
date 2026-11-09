@@ -15,6 +15,7 @@ Docstep is a maintained fork of [autoDocstring](https://github.com/NilsJPWerner/
 -   Fixed: a module docstring generated at the top of a file was indented ([upstream #152](https://github.com/NilsJPWerner/autoDocstring/issues/152)).
 -   Fixed: with a template saved with Windows line endings (the default on a Windows checkout, and any CRLF custom template), the blank lines between sections were filled with the indentation.
 -   Fixed: a type hint split over lines, such as a long `Literal[...]`, showed as `Literal[ "a", "b" ]` ([upstream #287](https://github.com/NilsJPWerner/autoDocstring/issues/287)).
+-   Fixed: generating on a blank line that held indentation left that indentation after the closing quotes ([upstream #162](https://github.com/NilsJPWerner/autoDocstring/issues/162)).
 -   Fixed: CRLF newlines in templates were not condensed ([upstream PR #199](https://github.com/NilsJPWerner/autoDocstring/pull/199), @justinchuby)
 -   Fixed: definitions with PEP 695 type parameters, including `*Ts` and `**P` ([upstream PR #304](https://github.com/NilsJPWerner/autoDocstring/pull/304), @miminiao)
 -   Unit tests run on Node 22 and later without extra flags

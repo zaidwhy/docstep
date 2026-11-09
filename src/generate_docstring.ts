@@ -28,10 +28,13 @@ export class AutoDocstring {
         const docstringSnippet = this.generateDocstringSnippet(document, position);
         logInfo(`Docstring generated:\n${docstringSnippet.value}`);
 
-        const insertPosition = position.with(undefined, 0);
-        logInfo(`Inserting at position: ${insertPosition.line} ${insertPosition.character}`);
+        // The snippet carries its own indentation, so a whitespace-only line is replaced
+        // rather than pushed after the closing quotes as trailing whitespace.
+        const line = this.editor.document.lineAt(position.line);
+        const insertLocation = line.isEmptyOrWhitespace ? line.range : position.with(undefined, 0);
+        logInfo(`Inserting at line: ${position.line}`);
 
-        const success = this.editor.insertSnippet(docstringSnippet, insertPosition);
+        const success = this.editor.insertSnippet(docstringSnippet, insertLocation);
 
         success.then(
             () => logInfo("Successfully inserted docstring"),

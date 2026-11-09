@@ -255,6 +255,21 @@ describe("Basic Integration Tests", function () {
             expect(text).to.contain("Raises:");
             expect(text.split("\n").filter((line) => /^[ \t]+$/.test(line))).to.deep.equal([]);
         });
+
+        it("leaves no trailing whitespace when the cursor is indented on a blank line", async function () {
+            const document = await vsc.workspace.openTextDocument({
+                language: "python",
+                content: "def pick(mode):\n    \n    return mode\n",
+            });
+            const editor = await vsc.window.showTextDocument(document);
+            editor.selection = new vsc.Selection(new vsc.Position(1, 4), new vsc.Position(1, 4));
+
+            expect(await vsc.commands.executeCommand(generateDocstringCommand)).to.equal(true);
+
+            const text = editor.document.getText();
+            expect(text).to.contain("_summary_");
+            expect(text.split("\n").filter((line) => /[ \t]$/.test(line))).to.deep.equal([]);
+        });
     });
 
     describe("Module Docstring Generation", function () {
