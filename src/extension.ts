@@ -1,7 +1,8 @@
 import * as vs from "vscode";
 import { AutoDocstring } from "./generate_docstring";
 import { validEnterActivation } from "./enter_activation";
-import { extensionRoot, generateDocstringCommand, extensionID } from "./constants";
+import { extensionRoot, generateDocstringCommand } from "./constants";
+import { getSetting } from "./config";
 import { getStackTrace } from "./telemetry";
 import { logInfo, logError } from "./logger";
 
@@ -32,9 +33,7 @@ export function activate(context: vs.ExtensionContext): void {
                 language,
                 {
                     provideCompletionItems: (document: vs.TextDocument, position: vs.Position) => {
-                        const enabled = vs.workspace
-                            .getConfiguration(extensionID)
-                            .get("generateDocstringOnEnter");
+                        const enabled = getSetting("generateDocstringOnEnter");
                         if (
                             validEnterActivation(
                                 document.getText(),
@@ -55,7 +54,7 @@ export function activate(context: vs.ExtensionContext): void {
         );
     });
 
-    logInfo("autoDocstring was activated");
+    logInfo("Docstep was activated");
 }
 
 /**
@@ -85,5 +84,5 @@ class AutoDocstringCompletionItem extends vs.CompletionItem {
 }
 
 function getQuoteStyle(): string {
-    return vs.workspace.getConfiguration(extensionID).get("quoteStyle").toString();
+    return getSetting("quoteStyle").toString();
 }

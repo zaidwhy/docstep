@@ -43,7 +43,7 @@ function sanitizeFilename(filename: string): string {
         return "<hidden_no_extension_root>";
     }
     if (filename.startsWith(extensionPath)) {
-        filename = `<autoDocstring>${filename.substring(extensionPath.length)}`;
+        filename = `<docstep>${filename.substring(extensionPath.length)}`;
     } else {
         // We don't really care about files outside our extension.
         filename = `<hidden>${pathSep}${pathBasename(filename)}`;

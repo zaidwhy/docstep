@@ -3,7 +3,7 @@ import * as vs from "vscode";
 import { DocstringFactory } from "./docstring/docstring_factory";
 import { getCustomTemplate, getTemplate } from "./docstring/get_template";
 import { getDocstringIndentation, getDefaultIndentation, parse } from "./parse";
-import { extensionID } from "./constants";
+import { getSetting } from "./config";
 import { logDebug, logInfo } from "./logger";
 import { docstringPartsToString } from "./docstring_parts";
 
@@ -44,15 +44,13 @@ export class AutoDocstring {
     }
 
     private generateDocstringSnippet(document: string, position: vs.Position): vs.SnippetString {
-        const config = this.getConfig();
-
         const docstringFactory = new DocstringFactory(
             this.getTemplate(),
-            config.get("quoteStyle").toString(),
-            config.get("startOnNewLine") === true,
-            config.get("includeExtendedSummary") === true,
-            config.get("includeName") === true,
-            config.get("guessTypes") === true,
+            getSetting("quoteStyle").toString(),
+            getSetting("startOnNewLine") === true,
+            getSetting("includeExtendedSummary") === true,
+            getSetting("includeName") === true,
+            getSetting("guessTypes") === true,
         );
         logDebug(docstringFactory.toString());
 
@@ -71,11 +69,10 @@ export class AutoDocstring {
     }
 
     private getTemplate(): string {
-        const config = this.getConfig();
-        let customTemplatePath = config.get("customTemplatePath").toString();
+        let customTemplatePath = getSetting("customTemplatePath").toString();
 
         if (customTemplatePath === "") {
-            const docstringFormat = config.get("docstringFormat").toString();
+            const docstringFormat = getSetting("docstringFormat").toString();
             return getTemplate(docstringFormat);
         }
 
@@ -84,9 +81,5 @@ export class AutoDocstring {
         }
 
         return getCustomTemplate(customTemplatePath);
-    }
-
-    private getConfig(): vs.WorkspaceConfiguration {
-        return vs.workspace.getConfiguration(extensionID);
     }
 }

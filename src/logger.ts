@@ -3,14 +3,14 @@
 // Code borrowed from https://github.com/DonJayamanne/gitHistoryVSCode
 
 import * as vscode from "vscode";
-import { extensionID } from "./constants";
+import { getSetting } from "./config";
 
 let outLogChannel: vscode.OutputChannel;
-const logLevel = vscode.workspace.getConfiguration(extensionID).get("logLevel");
+const logLevel = getSetting("logLevel");
 
 export function getLogChannel() {
     if (outLogChannel === undefined) {
-        outLogChannel = vscode.window.createOutputChannel("autoDocstring");
+        outLogChannel = vscode.window.createOutputChannel("Docstep");
     }
     return outLogChannel;
 }
@@ -19,7 +19,7 @@ export function logError(error: any) {
     getLogChannel().appendLine(`[ERROR ${getTimeAndMs()}] ${String(error)}`);
     getLogChannel().show();
     return vscode.window.showErrorMessage(
-        "AutoDocstring encountered an error. Please view details in the 'autoDocstring' output window",
+        "Docstep encountered an error. Please view details in the 'Docstep' output window",
     );
 }
 

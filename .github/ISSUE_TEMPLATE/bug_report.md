@@ -11,7 +11,7 @@ A clear and concise description of what the bug is.
 
 **Versions (please complete the following information):**
 
--   autoDocstring Version:
+-   Docstep Version:
 -   Operating System:
 -   Vscode Version:
 
@@ -34,14 +34,14 @@ A clear and concise description of what the bug is.
 ```
 
 **Debug log:**
-Set `autoDocstring.logLevel` to "Debug", recreate the bug, and then copy the debug logs from the `autoDocstring` output channel.
+Set `docstep.logLevel` to "Debug", recreate the bug, and then copy the debug logs from the `Docstep` output channel.
 
 ```
 
 ```
 
 **Stack trace:**
-If an error was reported by autoDocstring please copy the stack trace from the `autoDocstring` output channel.
+If an error was reported by Docstep please copy the stack trace from the `Docstep` output channel.
 
 ```
 
