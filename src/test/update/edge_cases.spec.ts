@@ -83,4 +83,34 @@ describe("docstringIsClosed() on prose before closing quotes", () => {
 
         expect(docstringIsClosed(compute, 1, 7, '"""')).to.equal(true);
     });
+
+    it("should see prose that reads like an assignment before the closing quotes as a closing line", () => {
+        const render = py(
+            "def render():",
+            '    """',
+            "    Use it as:",
+            '        text = """',
+            "    return 1",
+        );
+
+        expect(docstringIsClosed(render, 1, 7, '"""')).to.equal(true);
+    });
+
+    it("should ignore triple quotes in a comment after code below the cursor", () => {
+        const count = py("def count():", '    """', '    x = 1  # """', "    return x");
+
+        expect(docstringIsClosed(count, 1, 7, '"""')).to.equal(false);
+    });
+
+    it("should ignore triple quotes in a comment after code above the cursor", () => {
+        const count = py("def count():", '    x = 1  # """', '    """', "    return x");
+
+        expect(docstringIsClosed(count, 2, 7, '"""')).to.equal(false);
+    });
+
+    it("should still read a # without a following space before the closing quotes as prose", () => {
+        const track = py("def track():", '    """', '    See issue #3"""', "    return 1");
+
+        expect(docstringIsClosed(track, 1, 7, '"""')).to.equal(true);
+    });
 });

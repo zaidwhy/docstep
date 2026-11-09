@@ -29,19 +29,23 @@ function quotesCloseExistingDocstring(
     let numberOfTripleQuotes = 0;
 
     for (const line of linesBeforePosition.reverse()) {
-        if (isComment(line)) {
-            continue;
-        }
         if (line.includes("def ") || line.includes("class ")) {
             break;
         }
 
-        numberOfTripleQuotes += occurrences(line, quoteStyle);
+        numberOfTripleQuotes += quoteTokens(line, quoteStyle);
     }
 
     return numberOfTripleQuotes % 2 === 0;
 }
 
+/**
+ * Whether the typed quotes reopen a docstring that is already closed further down. Every
+ * string in the body adds an even number of quote tokens, so an odd count left before the
+ * function ends means one of them is the closing quote of that docstring. Deciding by parity
+ * rather than line by line is what tells `text = """hello"""` (a string) apart from prose
+ * like `value = """` that ends an existing docstring.
+ */
 function quotesOpenExistingDocstring(
     lines: string[],
     linePosition: number,
@@ -56,52 +60,25 @@ function quotesOpenExistingDocstring(
         return true;
     }
 
+    let quotes = 0;
     for (const line of linesAfterPosition.slice(1)) {
-        if (isComment(line)) {
-            continue;
-        }
         // A line left of the docstring is outside the function, so its quotes are not ours.
         if (!blankLine(line) && indentationOf(line) < originalIndentation) {
-            return false;
+            break;
         }
-        const quotes = occurrences(line, quoteStyle);
-        // An even count is a string that opens and closes on its own line, and quotes after
-        // `=`, `(`, `,` or `return` open a new string; neither can close the docstring.
-        if (quotes % 2 === 1) {
-            return !opensString(line, quoteStyle);
-        }
-
-        if (line.includes("def ") || line.includes("class ")) {
-            return false;
-        }
+        quotes += quoteTokens(line, quoteStyle);
     }
 
-    return false;
-}
-
-function isComment(line: string): boolean {
-    return line.trim().startsWith("#");
+    return quotes % 2 === 1;
 }
 
 /**
- * True when the first quotes on the line follow code that starts a string value: an
- * assignment, a bare return or yield, or an argument inside a bracket still open on the line.
- * Prose closing a docstring ("the value to return""") matches none of these from the line start.
+ * Quote tokens on the line, leaving out a comment. A `#` starts a comment only when it stands
+ * alone (`x = 1  # note`), so docstring prose like `see issue #3"""` keeps its closing quotes.
  */
-function opensString(line: string, quoteStyle: string): boolean {
-    const before = line
-        .slice(0, line.indexOf(quoteStyle))
-        .replace(/[rRbBfFuU]{1,2}$/, "")
-        .trim();
-    if (/^(?:return|yield)$/.test(before)) {
-        return true;
-    }
-    if (/^[A-Za-z_][\w.]*(?:\[[^\]]*\])?\s*(?::[^=]+)?[-+*/|&]?=$/.test(before)) {
-        return true;
-    }
-    const opened = (before.match(/[([{]/g) ?? []).length;
-    const closed = (before.match(/[)\]}]/g) ?? []).length;
-    return /[([{,]$/.test(before) && opened > closed;
+function quoteTokens(line: string, quoteStyle: string): number {
+    const comment = line.search(/(?:^|\s)#(?:\s|$)/);
+    return occurrences(comment === -1 ? line : line.slice(0, comment), quoteStyle);
 }
 
 function sliceUpToPosition(lines: string[], linePosition: number, charPosition: number): string[] {
