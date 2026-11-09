@@ -1,5 +1,5 @@
 import { arraysEqual } from "./lines";
-import { DocstringLocation, locateDocstring, locateFunction } from "./locate";
+import { DocstringLocation, locateDocstring, locateFunction, locateInit } from "./locate";
 import { readSignature } from "./signature";
 import { updateGoogle } from "./google";
 import { updateNumpy } from "./numpy";
@@ -78,12 +78,21 @@ function update(document: string, cursorLine: number, settings: UpdateSettings):
     const docstring = locateDocstring(lines, fn);
     const eol = lineEnding(rawLines, docstring);
 
-    const signature = readSignature(lines, fn, docstring);
-    const options: FormatOptions = { includeTypes: family === format, guessTypes: settings.guessTypes };
+    const signature =
+        fn.kind === "class"
+            ? classSignature(readSignature(lines, locateInit(lines, fn), docstring))
+            : readSignature(lines, fn, docstring);
+    const options: FormatOptions = {
+        includeTypes: family === format,
+        guessTypes: settings.guessTypes,
+    };
     const updated = updater(docstring.lines, signature, options, docstring.indentation);
 
     if (arraysEqual(updated, docstring.lines)) {
-        return { kind: "unchanged", message: `The docstring of "${fn.name}" is already up to date.` };
+        return {
+            kind: "unchanged",
+            message: `The docstring of "${fn.name}" is already up to date.`,
+        };
     }
 
     return {
@@ -96,13 +105,20 @@ function update(document: string, cursorLine: number, settings: UpdateSettings):
     };
 }
 
+/** A class docstring documents the constructor's parameters; what __init__ returns or raises stays in __init__. */
+function classSignature(init: Signature): Signature {
+    return { params: init.params, exceptions: [] };
+}
+
 /** The docstring's own line ending. Mixed endings inside the docstring are refused. */
 function lineEnding(rawLines: string[], docstring: DocstringLocation): string {
     const endings = rawLines
         .slice(docstring.startLine, docstring.endLine)
         .map((line) => (line.endsWith("\r") ? "\r\n" : "\n"));
     if (new Set(endings).size > 1) {
-        throw new UpdateRefusal("The docstring mixes CRLF and LF line endings. Normalize them first.");
+        throw new UpdateRefusal(
+            "The docstring mixes CRLF and LF line endings. Normalize them first.",
+        );
     }
     return endings[0] ?? (rawLines[docstring.startLine].endsWith("\r") ? "\r\n" : "\n");
 }

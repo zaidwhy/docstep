@@ -2,6 +2,8 @@ import { indentationOf, isBlank } from "./lines";
 import { UpdateRefusal } from "./types";
 
 export interface FunctionLocation {
+    /** A class is updated from the parameters of its __init__. */
+    kind: "function" | "class";
     defLine: number;
     /** Line holding the colon that ends the def header. */
     headerEndLine: number;
@@ -25,31 +27,49 @@ export interface DocstringLocation {
 }
 
 const defPattern = /^\s*(?:async\s+)?def\s+([A-Za-z_]\w*)/;
+const classPattern = /^\s*class\s+([A-Za-z_]\w*)/;
+const initPattern = /^\s*(?:async\s+)?def\s+__init__\b/;
 
-/** Finds the innermost function whose def header or body contains `cursorLine`. */
+/**
+ * Finds the innermost function whose def header or body contains `cursorLine`, or the class
+ * whose header or docstring contains it. Elsewhere in a class body there is no target.
+ */
 export function locateFunction(lines: string[], cursorLine: number): FunctionLocation {
     // A cursor on a decorator means the function it decorates, never the one around it.
     cursorLine = decoratedDefLine(lines, Math.min(cursorLine, lines.length - 1)) ?? cursorLine;
     for (let line = Math.min(cursorLine, lines.length - 1); line >= 0; line--) {
-        const match = lines[line].match(defPattern);
+        const defMatch = lines[line].match(defPattern);
+        const classMatch = defMatch == null ? lines[line].match(classPattern) : null;
+        const match = defMatch ?? classMatch;
         if (match == null) {
             continue;
         }
+        const kind = defMatch != null ? "function" : "class";
+        const keyword = defMatch != null ? "def" : "class";
         const header = findHeaderEnd(lines, line);
         if (header === undefined) {
-            throw new UpdateRefusal(`Could not find the end of the def header of "${match[1]}".`);
+            throw new UpdateRefusal(
+                `Could not find the end of the ${keyword} header of "${match[1]}".`,
+            );
         }
         const headerEndLine = header.line;
         if (header.bodyOnSameLine) {
             if (cursorLine <= headerEndLine) {
                 throw new UpdateRefusal(
-                    "The function body is on the same line as the def. Move it to its own line first.",
+                    `The ${kind} body is on the same line as the ${keyword}. Move it to its own line first.`,
                 );
             }
             continue;
         }
-        if (cursorLine <= bodyEnd(lines, line, headerEndLine)) {
-            return { defLine: line, headerEndLine, name: match[1] };
+        const location: FunctionLocation = { kind, defLine: line, headerEndLine, name: match[1] };
+        if (kind === "function" && cursorLine <= bodyEnd(lines, line, headerEndLine)) {
+            return location;
+        }
+        if (
+            kind === "class" &&
+            (cursorLine <= headerEndLine || cursorLine <= docstringEnd(lines, location))
+        ) {
+            return location;
         }
     }
 
@@ -73,7 +93,11 @@ function decoratedDefLine(lines: string[], cursorLine: number): number | undefin
             }
             break;
         }
-        if (line !== cursorLine && !isBlank(lines[line]) && indentationOf(lines[line]).length <= indentationOf(lines[cursorLine]).length) {
+        if (
+            line !== cursorLine &&
+            !isBlank(lines[line]) &&
+            indentationOf(lines[line]).length <= indentationOf(lines[cursorLine]).length
+        ) {
             break;
         }
     }
@@ -91,12 +115,63 @@ function decoratedDefLine(lines: string[], cursorLine: number): number | undefin
             line = statementEnd(lines, line);
             continue;
         }
-        if (defPattern.test(text) && indentationOf(text).length === indentation) {
+        if (
+            (defPattern.test(text) || classPattern.test(text)) &&
+            indentationOf(text).length === indentation
+        ) {
             return line;
         }
         break;
     }
-    throw new UpdateRefusal("The decorator under the cursor does not decorate a function.");
+    throw new UpdateRefusal(
+        "The decorator under the cursor does not decorate a function or a class.",
+    );
+}
+
+/** Last line of the class docstring, or -1 when the class has none. */
+function docstringEnd(lines: string[], cls: FunctionLocation): number {
+    try {
+        return locateDocstring(lines, cls).endLine;
+    } catch (error) {
+        if (error instanceof UpdateRefusal) {
+            return -1;
+        }
+        throw error;
+    }
+}
+
+/** The __init__ defined directly in the class body, whose parameters the class docstring documents. */
+export function locateInit(lines: string[], cls: FunctionLocation): FunctionLocation {
+    const end = bodyEnd(lines, cls.defLine, cls.headerEndLine);
+    let bodyIndentation: number | undefined;
+    for (let line = cls.headerEndLine + 1; line <= end; line++) {
+        const text = lines[line];
+        if (isBlank(text) || text.trim().startsWith("#")) {
+            continue;
+        }
+        bodyIndentation ??= indentationOf(text).length;
+        if (indentationOf(text).length !== bodyIndentation) {
+            continue;
+        }
+        if (initPattern.test(text)) {
+            const header = findHeaderEnd(lines, line);
+            if (header === undefined) {
+                throw new UpdateRefusal(
+                    `Could not find the end of the def header of "${cls.name}.__init__".`,
+                );
+            }
+            return {
+                kind: "function",
+                defLine: line,
+                headerEndLine: header.line,
+                name: "__init__",
+            };
+        }
+        line = statementEnd(lines, line);
+    }
+    throw new UpdateRefusal(
+        `"${cls.name}" has no __init__. Update Docstring fills a class docstring from the __init__ parameters.`,
+    );
 }
 
 /** Last line of the statement starting at `start`, following open brackets across lines. */
@@ -142,7 +217,10 @@ function statementEnd(lines: string[], start: number): number {
 }
 
 /** Line of the colon that closes the def header, skipping brackets, strings and comments. */
-function findHeaderEnd(lines: string[], defLine: number): { line: number; bodyOnSameLine: boolean } | undefined {
+function findHeaderEnd(
+    lines: string[],
+    defLine: number,
+): { line: number; bodyOnSameLine: boolean } | undefined {
     let depth = 0;
     let quote: string | undefined;
 

@@ -48,17 +48,19 @@ describe("updateDocstring() with the cursor on a decorator", () => {
         );
 
         for (const cursorLine of [1, 2, 4, 6]) {
-            expect(updated("google", source, cursorLine)).to.contain("            page (_type_): _description_");
+            expect(updated("google", source, cursorLine)).to.contain(
+                "            page (_type_): _description_",
+            );
         }
     });
 
-    it("should refuse a decorator that decorates a class", () => {
-        const source = py("@dataclass", "class Point:", "    x: int");
+    it("should refuse a decorator that decorates neither a function nor a class", () => {
+        const source = py("@cache", "value = 1");
         const result = run("google", source, 0);
 
         expect(result.kind).to.equal("refused");
         expect(result.kind === "refused" ? result.message : "").to.equal(
-            "The decorator under the cursor does not decorate a function.",
+            "The decorator under the cursor does not decorate a function or a class.",
         );
     });
 });

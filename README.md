@@ -85,6 +85,8 @@ def fetch(url: str, timeout: float = 5.0) -> bytes:
 
 It works with the `google`, `numpy` and `sphinx` formats and their `-notypes` variants, read from `docstep.docstringFormat`.
 
+On a class, with the cursor on the `class` line, one of its decorators or inside its docstring, the command matches the class docstring's parameters to the class's own `__init__`, as the Google and NumPy style guides allow. Base classes are never treated as parameters, and what `__init__` returns or raises stays in the `__init__` docstring. With the cursor inside `__init__`, the `__init__` docstring is updated instead.
+
 | What | Rule |
 | --- | --- |
 | Kept | The description you wrote for every parameter still in the signature, word for word. The summary, extended description, quote style, indentation, line endings and every section Docstep does not model (Examples, Notes, See Also, `.. note::` blocks and so on) stay byte for byte. |
@@ -105,8 +107,9 @@ Docstep makes no edit, and says why, when it cannot read the docstring with conf
 -   sphinx fields split into two blocks by text
 -   mixed CRLF and LF line endings inside the docstring
 -   `docstep.docstringFormat` is not google, numpy or sphinx (the message names it), or `docstep.customTemplatePath` is set
--   the cursor is not on a `def` line or inside a function, or the function body is on the `def` line
--   the cursor is on a decorator that decorates a class rather than a function
+-   the cursor is not on a `def` line, inside a function, or on a class header or class docstring, or the body is on the same line as the `def` or `class`
+-   the class has no `__init__` of its own, such as a dataclass or a class that inherits its constructor
+-   the cursor is on a decorator that decorates neither a function nor a class
 
 ## Extension Settings
 
