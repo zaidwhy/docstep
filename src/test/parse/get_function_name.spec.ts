@@ -27,4 +27,11 @@ describe("getFunctionName()", () => {
 
         expect(result).to.eql("first");
     });
+
+    it("should get the function name with TypeVarTuple and ParamSpec parameters", () => {
+        const functionDefinition = "def call[*Ts, **P](target: Callable[P, None], *args: *Ts):";
+        const result = getFunctionName(functionDefinition);
+
+        expect(result).to.eql("call");
+    });
 });

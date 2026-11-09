@@ -129,6 +129,13 @@ describe("tokenizeDefinition()", () => {
             expect(result).to.have.ordered.members(["value:N", "low:N=0", "-> N"]);
         });
 
+        it("should tokenize a function with TypeVarTuple and ParamSpec parameters", () => {
+            const functionDefinition = "def call[*Ts, **P](target: Callable[P, None], *args: *Ts):";
+            const result = tokenizeDefinition(functionDefinition);
+
+            expect(result).to.have.ordered.members(["target:Callable[P, None]", "*args:*Ts"]);
+        });
+
         it("should tokenize a generic class", () => {
             const functionDefinition = "class Box[T](Generic):";
             const result = tokenizeDefinition(functionDefinition);
