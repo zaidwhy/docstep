@@ -125,6 +125,11 @@
                     "default": false,
                     "description": "Document *args and **kwargs: Generate Docstring lists them, and Update Docstring adds them when missing"
                 },
+                "docstep.detectRenames": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Update Docstring: when exactly one parameter was renamed in place, move its description to the new name instead of dropping it"
+                },
                 "docstep.guessTypes": {
                     "type": "boolean",
                     "default": true,

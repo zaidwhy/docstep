@@ -4,7 +4,7 @@ class Shop(Base):
 
     Args:
         name (str): Shop name.
-        size (int, optional): _description_. Defaults to 3.
+        size (int, optional): Gone.
     """
 
     def __init__(self, name: str, size: int = 3):

@@ -46,6 +46,8 @@ export interface FormatOptions {
     guessTypes: boolean;
     /** The docstep.includeVariadicArgs setting. When false, missing *args and **kwargs are not added. */
     includeVariadicArgs?: boolean;
+    /** The docstep.detectRenames setting. When true, one parameter renamed in place keeps its description. */
+    detectRenames?: boolean;
 }
 
 export const typePlaceholder = "_type_";

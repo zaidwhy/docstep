@@ -113,6 +113,36 @@ export function reconcileParamType(
     return withOptional(base, optional);
 }
 
+export interface Rename {
+    from: string;
+    to: string;
+}
+
+/**
+ * A renamed parameter looks like one documented name gone and one new name in the signature.
+ * It counts as a rename only when that is the whole difference and both follow the same
+ * surviving parameter, so a description is never moved onto an unrelated parameter. Starred
+ * parameters are left out: their stars belong to the description's meaning.
+ */
+export function findRename(documented: string[], params: SignatureParam[]): Rename | undefined {
+    const signatureNames = params.map((param) => param.name);
+    const gone = documented.filter((name) => !signatureNames.includes(name));
+    const added = params.filter((param) => param.kind !== "variadic" && !documented.includes(param.name));
+    if (gone.length !== 1 || added.length !== 1) {
+        return undefined;
+    }
+
+    const survives = (name: string) => signatureNames.includes(name) && documented.includes(name);
+    const before = (names: string[], name: string) => {
+        const surviving = names.slice(0, names.indexOf(name)).filter(survives);
+        return surviving[surviving.length - 1];
+    };
+    if (before(documented, gone[0]) !== before(signatureNames, added[0].name)) {
+        return undefined;
+    }
+    return { from: gone[0], to: added[0].name };
+}
+
 /** Finds the documented entry for every name and refuses duplicates. */
 export function indexByName<T>(items: T[], nameOf: (item: T) => string, section: string): Map<string, T> {
     const byName = new Map<string, T>();

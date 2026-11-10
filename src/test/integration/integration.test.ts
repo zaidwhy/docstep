@@ -289,6 +289,11 @@ describe("Basic Integration Tests", function () {
     });
 
     describe("Jupyter Notebook", function () {
+        // The untitled notebook is dirty; closing it without reverting would raise a save prompt.
+        after(async function () {
+            await vsc.commands.executeCommand("workbench.action.revertAndCloseActiveEditor");
+        });
+
         it("generates a docstring inside a notebook code cell", async function () {
             const notebook = await vsc.workspace.openNotebookDocument(
                 "jupyter-notebook",
@@ -373,6 +378,17 @@ describe("Basic Integration Tests", function () {
                 ),
                 inputFilePath: path.resolve(__dirname, "./python_test_files/update_function.py"),
                 position: new vsc.Position(4, 0),
+            });
+        });
+
+        it("keeps the description of a renamed parameter by default", async function () {
+            await testDocstringUpdate({
+                expectedOutputFilePath: path.resolve(
+                    __dirname,
+                    "./python_test_files/update_rename_output.py",
+                ),
+                inputFilePath: path.resolve(__dirname, "./python_test_files/update_rename.py"),
+                position: new vsc.Position(1, 0),
             });
         });
 

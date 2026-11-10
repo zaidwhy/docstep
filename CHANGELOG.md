@@ -1,5 +1,9 @@
 # Change Log
 
+## Docstep 1.1.0 (unreleased)
+
+-   Added: Update Docstring keeps the description of a renamed parameter. When exactly one parameter was renamed in place, its entry moves to the new name word for word (google, numpy and sphinx, including the sphinx `:type:` field); anything less clear-cut still gets a placeholder. On by default, `docstep.detectRenames` turns it off ([upstream #177](https://github.com/NilsJPWerner/autoDocstring/issues/177)).
+
 ## Docstep 1.0.1 (2026-11-10)
 
 -   Fixed: a return type that nests a quoted forward reference, such as `-> Iterable["Node"]`, left the docstring without its arguments and return ([upstream #248](https://github.com/NilsJPWerner/autoDocstring/issues/248)).

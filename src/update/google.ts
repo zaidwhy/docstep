@@ -4,6 +4,7 @@ import {
     Entry,
     EntryList,
     indentationOf,
+    findRename,
     indexByName,
     isBlank,
     isTypeLike,
@@ -276,10 +277,17 @@ function updateParams(
     const heads = list.entries.map((entry) => ({ entry, head: parseParamHead(entry.lines[0], title) }));
     const documented = indexByName(heads, (item) => item.head.name, title);
     const indentation = heads.length > 0 ? heads[0].head.indentation : base + unit;
+    const rename =
+        options.detectRenames === true
+            ? findRename(
+                  heads.filter((item) => item.head.stars === "").map((item) => item.head.name),
+                  params,
+              )
+            : undefined;
 
     const entries: Entry[] = [];
     for (const param of params) {
-        const found = documented.get(param.name);
+        const found = documented.get(param.name === rename?.to ? rename.from : param.name);
         if (found !== undefined) {
             entries.push(updateParamEntry(found.entry, found.head, param, options));
         } else if (param.kind !== "variadic" || options.includeVariadicArgs === true) {
@@ -302,10 +310,10 @@ function updateParamEntry(
     if (entry.lines.length === 1 && placeholderDescription.test(rest.trim())) {
         rest = " " + description(param);
     }
-    if (type === head.type && rest === head.rest) {
+    if (type === head.type && rest === head.rest && head.name === param.name) {
         return entry;
     }
-    return { lines: [formatHead(head, type, rest), ...entry.lines.slice(1)] };
+    return { lines: [formatHead({ ...head, name: param.name }, type, rest), ...entry.lines.slice(1)] };
 }
 
 function updateRaises(

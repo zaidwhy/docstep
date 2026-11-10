@@ -21,6 +21,7 @@ export function updateDocstringAtCursor(editor: vs.TextEditor | undefined): Then
         customTemplatePath: getSetting("customTemplatePath").toString(),
         guessTypes: getSetting("guessTypes") === true,
         includeVariadicArgs: getSetting("includeVariadicArgs") === true,
+        detectRenames: getSetting("detectRenames") === true,
     });
 
     if (result.kind !== "edit") {

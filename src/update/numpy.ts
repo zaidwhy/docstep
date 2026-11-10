@@ -6,6 +6,7 @@ import {
     Entry,
     EntryList,
     indentationOf,
+    findRename,
     indexByName,
     isBlank,
     isDocumented,
@@ -196,10 +197,17 @@ function updateParams(
     const title = section?.title ?? "Parameters";
     const heads = list.entries.map((entry) => ({ entry, head: parseParamHead(entry.lines[0], title) }));
     const documented = indexByName(heads, (item) => item.head.name, title);
+    const rename =
+        options.detectRenames === true
+            ? findRename(
+                  heads.filter((item) => item.head.stars === "").map((item) => item.head.name),
+                  params,
+              )
+            : undefined;
 
     const entries: Entry[] = [];
     for (const param of params) {
-        const found = documented.get(param.name);
+        const found = documented.get(param.name === rename?.to ? rename.from : param.name);
         if (found !== undefined) {
             entries.push(updateParamEntry(found.entry, found.head, param, options, base));
         } else if (param.kind !== "variadic" || options.includeVariadicArgs === true) {
@@ -224,6 +232,11 @@ function updateParamEntry(
     base: string,
 ): Entry {
     const lines = [...entry.lines];
+    if (head.name !== param.name) {
+        const nameStart = indentationOf(lines[0]).length + head.stars.length;
+        lines[0] = lines[0].slice(0, nameStart) + param.name + lines[0].slice(nameStart + head.name.length);
+        head = { ...head, name: param.name };
+    }
     if (!head.optionalOnly) {
         const type = reconcileParamType(head.type, param, options);
         if (type !== head.type) {

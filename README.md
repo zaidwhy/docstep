@@ -97,7 +97,7 @@ On a class, with the cursor on the `class` line, one of its decorators or inside
 | Order | Parameters follow the signature. In sphinx, each `:type:` field moves under its `:param:` field. |
 | Types | In the typed formats a parameter's type becomes its annotation, and `, optional` follows whether it has a default. A type you wrote is kept when the signature has no annotation. A single Returns or Yields entry follows the return annotation. The `-notypes` formats never touch types. |
 | Defaults | A description that is still the `_description_` placeholder is regenerated, so its default follows the signature. A description you wrote is never edited, so a default you mention in it is not updated. |
-| Renames | A renamed parameter is one parameter removed and another added: the old description is dropped and the new name gets a placeholder. Copy the description across first if you want to keep it. |
+| Renames | When exactly one parameter disappeared and exactly one new one took its place (same neighbour before it, neither starred), it is a rename: the entry keeps its description, word for word, under the new name, and in sphinx the `:type:` field follows. Any other change (two renames at once, a parameter that moved) is treated as removed and added, with a placeholder, because a description must never land on an unrelated parameter. Turn `docstep.detectRenames` off to always treat a rename as removed and added. |
 | `self`, `cls`, `*args`, `**kwargs` | `self` and `cls` are skipped, as in Generate Docstring. Documented `*args` and `**kwargs` stay, in signature order. Missing ones are added only when `docstep.includeVariadicArgs` is on. |
 
 Docstep makes no edit, and says why, when it cannot read the docstring with confidence:
@@ -123,6 +123,7 @@ Docstep makes no edit, and says why, when it cannot read the docstring with conf
 -   `docstep.includeName`: Include function name at the start of docstring
 -   `docstep.startOnNewLine`: New line before summary placeholder
 -   `docstep.guessTypes`: Infer types from type hints, default values and variable names
+-   `docstep.detectRenames`: Update Docstring moves the description of a parameter renamed in place to its new name (on by default)
 -   `docstep.includeVariadicArgs`: Document `*args` and `**kwargs` (off by default). Generate Docstring lists `*args` after the positional parameters and `**kwargs` last, in every format, and Update Docstring adds them when they are missing
 -   `docstep.quoteStyle`: The style of quotes for docstrings
 -   `docstep.logLevel`: Output log level (`None`, `Info`, `Debug`)

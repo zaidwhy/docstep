@@ -19,6 +19,8 @@ export interface UpdateSettings {
     guessTypes: boolean;
     /** docstep.includeVariadicArgs: add missing *args and **kwargs. Off unless set. */
     includeVariadicArgs?: boolean;
+    /** docstep.detectRenames: carry the description of a parameter renamed in place. Off unless set. */
+    detectRenames?: boolean;
 }
 
 export type UpdateResult =
@@ -95,6 +97,7 @@ function update(document: string, cursorLine: number, settings: UpdateSettings):
         includeTypes: family === format,
         guessTypes: settings.guessTypes,
         includeVariadicArgs: settings.includeVariadicArgs === true,
+        detectRenames: settings.detectRenames === true,
     };
     const updated = updater(docstring.lines, signature, options, docstring.indentation);
 

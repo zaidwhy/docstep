@@ -1,6 +1,7 @@
 import {
     arraysEqual,
     baseIndentation,
+    findRename,
     indentationOf,
     isBlank,
     isDocumented,
@@ -215,10 +216,20 @@ function updateParams(
         map.set(name, field);
     }
 
+    const unstarred = [...paramFields.values()].filter((field) => paramParts(field).stars === "");
+    const rename =
+        options.detectRenames === true
+            ? findRename(
+                  unstarred.map((field) => paramParts(field).name),
+                  params,
+              )
+            : undefined;
+
     const group: Field[] = [];
     for (const param of params) {
-        const paramField = paramFields.get(param.name);
-        const typeField = typeFields.get(param.name);
+        const documentedName = param.name === rename?.to ? rename.from : param.name;
+        const paramField = renamedField(paramFields.get(documentedName), documentedName, param.name);
+        const typeField = renamedField(typeFields.get(documentedName), documentedName, param.name);
         const skipped = param.kind === "variadic" && options.includeVariadicArgs !== true;
         if (paramField === undefined && typeField === undefined && skipped) {
             continue;
@@ -230,6 +241,17 @@ function updateParams(
     const others = fields.filter((field) => field.kind !== "param" && field.kind !== "type");
     const at = first < 0 ? 0 : fields.slice(0, first).filter((field) => others.includes(field)).length;
     return [...others.slice(0, at), ...group, ...others.slice(at)];
+}
+
+/** The field with its parameter name swapped; the description and any inline type stay as written. */
+function renamedField(field: Field | undefined, from: string, to: string): Field | undefined {
+    if (field === undefined || from === to) {
+        return field;
+    }
+    // The name is the argument's last word, after any inline type and stars.
+    const argument = field.argument.slice(0, field.argument.length - from.length) + to;
+    const head = `${indentationOf(field.lines[0])}:${field.name} ${argument}:${field.rest}`;
+    return { ...field, argument, lines: [head, ...field.lines.slice(1)] };
 }
 
 function paramGroup(
