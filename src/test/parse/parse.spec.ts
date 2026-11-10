@@ -6,6 +6,17 @@ import { parse } from "../../parse";
 chai.config.truncateThreshold = 0;
 const expect = chai.expect;
 
+describe("parse() on a function", () => {
+    it("should keep the arguments and return when the return type nests a forward reference", () => {
+        const document = ['def build(value: "str") -> List["Node"]:', "    ", "    pass"].join("\n");
+
+        const parts = parse(document, 1);
+
+        expect(parts.args).to.deep.equal([{ var: "value", type: "str" }]);
+        expect(parts.returns).to.deep.equal({ type: 'List["Node"]' });
+    });
+});
+
 describe("parse() on a class", () => {
     it("should take the arguments from __init__, not the base classes", () => {
         const document = [

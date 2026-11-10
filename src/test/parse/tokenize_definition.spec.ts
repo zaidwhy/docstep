@@ -79,6 +79,13 @@ describe("tokenizeDefinition()", () => {
         ]);
     });
 
+    it("should keep the parameters when a forward reference is nested in the return type", () => {
+        const functionDefinition = 'def func(value: "str") -> Iterable["str"]:';
+        const result = tokenizeDefinition(functionDefinition);
+
+        expect(result).to.have.ordered.members(['value:"str"', '-> Iterable["str"]']);
+    });
+
     it("should tokenize pep484 return types", () => {
         const functionDefinition = "def func() -> str:";
         const result = tokenizeDefinition(functionDefinition);

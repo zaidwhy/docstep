@@ -1,5 +1,9 @@
 # Change Log
 
+## Docstep 1.0.1 (unreleased)
+
+-   Fixed: a return type that nests a quoted forward reference, such as `-> Iterable["Node"]`, left the docstring without its arguments and return ([upstream #248](https://github.com/NilsJPWerner/autoDocstring/issues/248)).
+
 ## Docstep 1.0.0 (2026-11-10)
 
 Docstep is a maintained fork of [autoDocstring](https://github.com/NilsJPWerner/autoDocstring) by Nils Werner, forked from upstream commit `c9da641` (after 0.6.1). Everything below this section is autoDocstring's history, kept as written.
