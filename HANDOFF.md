@@ -29,7 +29,7 @@ Decided 2026-11-10 (Zaid took the recommendations): repo goes public, publisher 
 Released 2026-11-10: repo public; `zaidwhy.docstep` 1.0.0 published on the VS Code Marketplace (display name shortened to "Docstep" after the Marketplace refused one too close to autoDocstring's) and on Open VSX (namespace `zaidwhy`; the API still answered "not found" minutes after publish, presumably the new-upload scan). CHANGELOG dated.
 
 Still Zaid's to run:
-- Tag and GitHub release (the auto-mode classifier refused it for Claude): `git tag -a v1.0.0 -m "Docstep 1.0.0" && git push origin v1.0.0 && gh release create v1.0.0 docstep-1.0.0.vsix --title "Docstep 1.0.0" --notes-file <CHANGELOG 1.0.0 section>`.
+- Done 2026-11-10: tag `v1.0.0` and GitHub release with the vsix (https://github.com/zaidwhy/docstep/releases/tag/v1.0.0). `gh` defaults to the upstream parent in this fork: pass `--repo zaidwhy/docstep` (or `gh repo set-default zaidwhy/docstep`).
 - Revoke the Azure DevOps and Open VSX tokens used for 1.0.0 (they were pasted into a chat); make fresh ones for the next release.
 - Confirm https://open-vsx.org/api/zaidwhy/docstep returns version 1.0.0.
 
