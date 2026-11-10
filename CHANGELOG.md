@@ -1,6 +1,6 @@
 # Change Log
 
-## Docstep 1.1.0 (unreleased)
+## Docstep 1.1.0 (2026-11-10)
 
 -   Added: Update Docstring keeps the description of a renamed parameter. When exactly one parameter was renamed in place, its entry moves to the new name word for word (google, numpy and sphinx, including the sphinx `:type:` field); anything less clear-cut still gets a placeholder. On by default, `docstep.detectRenames` turns it off ([upstream #177](https://github.com/NilsJPWerner/autoDocstring/issues/177)).
 -   Added `docstep.nameReturnValues` (off by default): in the numpy formats, `return mean, spread` gives one Returns entry per name, typed from a matching `tuple[...]` annotation. When the return statements disagree, the single entry stays ([upstream #62](https://github.com/NilsJPWerner/autoDocstring/issues/62)).

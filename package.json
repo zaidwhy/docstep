@@ -2,7 +2,7 @@
     "name": "docstep",
     "displayName": "Docstep",
     "description": "Generates Python docstrings and updates them when the signature changes. A maintained fork of autoDocstring by Nils Werner.",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "publisher": "zaidwhy",
     "license": "MIT",
     "icon": "images/icon.png",
