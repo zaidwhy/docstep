@@ -26,10 +26,12 @@ Taken without Zaid on 2026-11-10 under the overnight directive. Each one is a si
 
 Decided 2026-11-10 (Zaid took the recommendations): repo goes public, publisher `zaidwhy` on both stores, version `1.0.0`, Docstep's own icon (`images/icon.png`, triple quotes over steps) replaces the upstream one, the `autodocstring` keyword stays, #228 stays as is. Version, icon and README install line are done; `docstep-1.0.0.vsix` builds and installs (`zaidwhy.docstep@1.0.0`).
 
+Released 2026-11-10: repo public; `zaidwhy.docstep` 1.0.0 published on the VS Code Marketplace (display name shortened to "Docstep" after the Marketplace refused one too close to autoDocstring's) and on Open VSX (namespace `zaidwhy`; the API still answered "not found" minutes after publish, presumably the new-upload scan). CHANGELOG dated.
+
 Still Zaid's to run:
-- Flip the repo to public (`gh repo edit zaidwhy/docstep --visibility public --accept-visibility-change-consequences`).
-- Create the publisher `zaidwhy` on the VS Code Marketplace (Azure DevOps token) and on Open VSX, then publish with his own tokens via `!`: `npx @vscode/vsce publish` and `npx ovsx publish docstep-1.0.0.vsix -p <token>`.
-- After publishing: change CHANGELOG "1.0.0 (unreleased)" to the release date and tag `v1.0.0`.
+- Tag and GitHub release (the auto-mode classifier refused it for Claude): `git tag -a v1.0.0 -m "Docstep 1.0.0" && git push origin v1.0.0 && gh release create v1.0.0 docstep-1.0.0.vsix --title "Docstep 1.0.0" --notes-file <CHANGELOG 1.0.0 section>`.
+- Revoke the Azure DevOps and Open VSX tokens used for 1.0.0 (they were pasted into a chat); make fresh ones for the next release.
+- Confirm https://open-vsx.org/api/zaidwhy/docstep returns version 1.0.0.
 
 ## Known gaps
 
