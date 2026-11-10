@@ -34,7 +34,7 @@ Released 2026-11-10: repo public; `zaidwhy.docstep` 1.0.0 published on the VS Co
 Still Zaid's to run:
 - Done 2026-11-10: tag `v1.0.0` and GitHub release with the vsix (https://github.com/zaidwhy/docstep/releases/tag/v1.0.0). `gh` defaults to the upstream parent in this fork: pass `--repo zaidwhy/docstep` (or `gh repo set-default zaidwhy/docstep`).
 - 1.0.1 (#248, #244) released the same day: Marketplace package downloads, tag `v1.0.1` and GitHub release done. Short notes posted as zaidwhy on 15 upstream issues (#28 #255 #27 #246 #152 #170 #171 #68 #311 #253 #287 #162 #312 #248 #244; Zaid asked Claude to write them for this batch). Not replied: #177 (rename drops the description), #295 (cause unconfirmed), #315.
-- 1.1.0 (#177 renames, #62 named numpy returns, MIT field) published 2026-11-10 on the Marketplace (1.1.0 package downloads) and uploaded to Open VSX; notes posted on upstream #177 and #62. Tag `v1.1.0` and GitHub release: Zaid to run.
+- 1.1.0 (#177 renames, #62 named numpy returns, MIT field) published 2026-11-10 on the Marketplace (listed as the latest version by the gallery query) and uploaded to Open VSX; notes posted on upstream #177 and #62. Tag `v1.1.0` and GitHub release done (https://github.com/zaidwhy/docstep/releases/tag/v1.1.0).
 - Revoke the Azure DevOps and Open VSX tokens used for 1.0.0, 1.0.1 and 1.1.0 (pasted into a chat); make fresh ones for the next release.
 - Open VSX: both uploads are inactive because `zaidwhy` also exists on the VS Code Marketplace and the namespace is unverified. Claim filed as Option 1: https://github.com/EclipseFdn/open-vsx.org/issues/15498. Once approved, both versions activate without republishing.
 
