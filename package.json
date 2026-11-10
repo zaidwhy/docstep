@@ -4,7 +4,7 @@
     "description": "Generates Python docstrings and updates them when the signature changes. A maintained fork of autoDocstring by Nils Werner.",
     "version": "1.0.1",
     "publisher": "zaidwhy",
-    "license": "SEE LICENSE IN LICENSE",
+    "license": "MIT",
     "icon": "images/icon.png",
     "extensionKind": [
         "workspace"
