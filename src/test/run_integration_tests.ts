@@ -33,7 +33,7 @@ async function main() {
         console.error("Failed to run tests");
         process.exitCode = 1;
     } finally {
-        fs.rmSync(userDataDir, { recursive: true, force: true, maxRetries: 5 });
+        fs.rmSync(userDataDir, { recursive: true, force: true, maxRetries: 5 }); // craft-guard: allow test-force because this is fs.rmSync ignoring a missing dir, not a Playwright click
     }
 }
 
