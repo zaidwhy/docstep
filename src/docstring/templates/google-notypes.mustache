@@ -18,13 +18,6 @@ Args:
     {{var}}: {{descriptionPlaceholder}}
 {{/starKwargs}}
 {{/parametersExist}}
-{{#exceptionsExist}}
-
-Raises:
-{{#exceptions}}
-    {{type}}: {{descriptionPlaceholder}}
-{{/exceptions}}
-{{/exceptionsExist}}
 {{#returnsExist}}
 
 Returns:
@@ -39,3 +32,10 @@ Yields:
     {{descriptionPlaceholder}}
 {{/yields}}
 {{/yieldsExist}}
+{{#exceptionsExist}}
+
+Raises:
+{{#exceptions}}
+    {{type}}: {{descriptionPlaceholder}}
+{{/exceptions}}
+{{/exceptionsExist}}

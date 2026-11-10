@@ -310,7 +310,7 @@ describe("updateDocstring() google", () => {
         );
     });
 
-    it("should add Raises and Yields sections in generator order", () => {
+    it("should add Yields then Raises, the order of Google's style guide", () => {
         const source = py(
             "def numbers(limit: int) -> Iterator[int]:",
             '    """Count up.',
@@ -331,11 +331,11 @@ describe("updateDocstring() google", () => {
                 "    Args:",
                 "        limit (int): Upper bound.",
                 "",
-                "    Raises:",
-                "        ValueError: _description_",
-                "",
                 "    Yields:",
                 "        Iterator[int]: _description_",
+                "",
+                "    Raises:",
+                "        ValueError: _description_",
                 '    """',
                 "    if limit < 0:",
                 "        raise ValueError('negative')",

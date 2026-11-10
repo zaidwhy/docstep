@@ -68,7 +68,8 @@ const headers: Record<string, SectionKind | "unsupported"> = {
     warns: "other",
 };
 
-const order: SectionKind[] = ["params", "raises", "returns", "yields"];
+// Google's style guide orders the sections Args, Returns or Yields, then Raises.
+const order: SectionKind[] = ["params", "returns", "yields", "raises"];
 const defaultUnit = "    ";
 const inlineHeader = /^(Args|Arguments|Parameters|Params|Returns?|Yields?|Raises?):\s+\S/;
 

@@ -3,6 +3,7 @@
 ## Docstep 1.0.1 (unreleased)
 
 -   Fixed: a return type that nests a quoted forward reference, such as `-> Iterable["Node"]`, left the docstring without its arguments and return ([upstream #248](https://github.com/NilsJPWerner/autoDocstring/issues/248)).
+-   Changed: the google and google-notypes formats write Raises after Returns and Yields, the order of [Google's style guide](https://google.github.io/styleguide/pyguide.html#383-functions-and-methods); Update Docstring adds missing sections in the same order ([upstream #244](https://github.com/NilsJPWerner/autoDocstring/issues/244)).
 
 ## Docstep 1.0.0 (2026-11-10)
 

@@ -21,6 +21,7 @@ Taken without Zaid on 2026-11-10 under the overnight directive. Each one is a si
 6. **CI on Node 20 with stable VS Code.** Node 18 is past end of life, and insiders would make a red run ambiguous. `@vscode/test-electron` moved to 2.5.2 because 2.1.2 downloads from a CDN host that no longer resolves.
 7. **`*args` and `**kwargs` behind a setting (#171), reversible.** `docstep.includeVariadicArgs`, default off, so output is unchanged unless a user opts in. When on, Generate lists `*args` after the positional parameters and `**kwargs` last in all 11 templates, and Update adds them when missing (documented ones were always kept). To reverse: drop the setting and the `starArgs`/`starKwargs` blocks in the templates; nothing else depends on them.
 8. **Not done: "optional" for defaulted parameters (#228).** Napoleon's own examples write `(int, optional)` for a defaulted argument, so the current output is a style choice, not a bug.
+9. **Google sections ordered Args, Returns/Yields, Raises (#244), for 1.0.1.** Google's style guide gives that order and the upstream thread agreed; unlike #228 this is the guide's rule, not a style choice. It changes generated google output for everyone (only where Raises sits). To reverse: move the `exceptionsExist` block back above `returnsExist` in google.mustache and google-notypes.mustache, and restore `order` in src/update/google.ts.
 
 ## Waiting on Zaid (outward-facing, not decided overnight)
 
