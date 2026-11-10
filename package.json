@@ -1,7 +1,7 @@
 {
     "name": "docstep",
-    "displayName": "Docstep - Python Docstring Generator",
-    "description": "Generates Python docstrings. A maintained fork of autoDocstring by Nils Werner.",
+    "displayName": "Docstep",
+    "description": "Generates Python docstrings and updates them when the signature changes. A maintained fork of autoDocstring by Nils Werner.",
     "version": "1.0.0",
     "publisher": "zaidwhy",
     "license": "SEE LICENSE IN LICENSE",
