@@ -1,6 +1,6 @@
 # Change Log
 
-## Docstep 1.0.0 (unreleased)
+## Docstep 1.0.0 (2026-11-10)
 
 Docstep is a maintained fork of [autoDocstring](https://github.com/NilsJPWerner/autoDocstring) by Nils Werner, forked from upstream commit `c9da641` (after 0.6.1). Everything below this section is autoDocstring's history, kept as written.
 
