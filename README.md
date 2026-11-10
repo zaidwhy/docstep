@@ -13,7 +13,7 @@ git clone https://github.com/zaidwhy/docstep.git
 cd docstep
 npm install
 npx @vscode/vsce package
-code --install-extension docstep-1.0.0.vsix
+code --install-extension docstep-1.0.1.vsix
 ```
 
 If autoDocstring is also installed, disable or uninstall it: both extensions bind `ctrl+shift+2` and both offer a docstring on enter.
