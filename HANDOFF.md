@@ -24,10 +24,12 @@ Taken without Zaid on 2026-11-10 under the overnight directive. Each one is a si
 
 ## Waiting on Zaid (outward-facing, not decided overnight)
 
-- Public or private repo.
-- Create the Marketplace and Open VSX publisher `zaidwhy`.
-- Release version: `1.0.0-dev` must become a plain semver before the Marketplace accepts it.
-- Keep or replace the upstream icon; keep or drop the `autodocstring` search keyword.
+Decided 2026-11-10 (Zaid took the recommendations): repo goes public, publisher `zaidwhy` on both stores, version `1.0.0`, Docstep's own icon (`images/icon.png`, triple quotes over steps) replaces the upstream one, the `autodocstring` keyword stays, #228 stays as is. Version, icon and README install line are done; `docstep-1.0.0.vsix` builds and installs (`zaidwhy.docstep@1.0.0`).
+
+Still Zaid's to run:
+- Flip the repo to public (`gh repo edit zaidwhy/docstep --visibility public --accept-visibility-change-consequences`).
+- Create the publisher `zaidwhy` on the VS Code Marketplace (Azure DevOps token) and on Open VSX, then publish with his own tokens via `!`: `npx @vscode/vsce publish` and `npx ovsx publish docstep-1.0.0.vsix -p <token>`.
+- After publishing: change CHANGELOG "1.0.0 (unreleased)" to the release date and tag `v1.0.0`.
 
 ## Known gaps
 
