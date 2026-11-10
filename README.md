@@ -123,6 +123,7 @@ Docstep makes no edit, and says why, when it cannot read the docstring with conf
 -   `docstep.includeName`: Include function name at the start of docstring
 -   `docstep.startOnNewLine`: New line before summary placeholder
 -   `docstep.guessTypes`: Infer types from type hints, default values and variable names
+-   `docstep.nameReturnValues`: In the numpy formats, a function whose every `return` gives the same tuple of names (`return mean, spread`) gets one Returns entry per name, typed from a matching `tuple[...]` annotation (off by default)
 -   `docstep.detectRenames`: Update Docstring moves the description of a parameter renamed in place to its new name (on by default)
 -   `docstep.includeVariadicArgs`: Document `*args` and `**kwargs` (off by default). Generate Docstring lists `*args` after the positional parameters and `**kwargs` last, in every format, and Update Docstring adds them when they are missing
 -   `docstep.quoteStyle`: The style of quotes for docstrings

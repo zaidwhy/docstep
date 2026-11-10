@@ -35,6 +35,8 @@ export interface Exception {
 
 export interface Returns {
     type: string;
+    /** The names of a returned tuple (`return mean, spread`), for docstep.nameReturnValues. */
+    values?: Argument[];
 }
 
 export interface Yields {

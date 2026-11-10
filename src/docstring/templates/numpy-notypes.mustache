@@ -27,9 +27,17 @@ Parameters
 
 Returns
 -------
+{{#namedReturnsExist}}
+{{#namedReturns}}
+{{var}}
+    {{descriptionPlaceholder}}
+{{/namedReturns}}
+{{/namedReturnsExist}}
+{{^namedReturnsExist}}
 {{#returns}}
     {{descriptionPlaceholder}}
 {{/returns}}
+{{/namedReturnsExist}}
 {{/returnsExist}}
 {{#yieldsExist}}
 

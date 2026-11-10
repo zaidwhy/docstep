@@ -56,6 +56,7 @@ export class AutoDocstring {
             getSetting("includeName") === true,
             getSetting("guessTypes") === true,
             getSetting("includeVariadicArgs") === true,
+            getSetting("nameReturnValues") === true,
         );
         logDebug(docstringFactory.toString());
 

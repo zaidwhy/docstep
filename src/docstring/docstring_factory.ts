@@ -16,6 +16,7 @@ export class DocstringFactory {
     private includeName: boolean;
     private guessTypes: boolean;
     private includeVariadicArgs: boolean;
+    private nameReturnValues: boolean;
 
     constructor(
         template: string,
@@ -25,8 +26,10 @@ export class DocstringFactory {
         includeName = false,
         guessTypes = true,
         includeVariadicArgs = false,
+        nameReturnValues = false,
     ) {
         this.includeVariadicArgs = includeVariadicArgs;
+        this.nameReturnValues = nameReturnValues;
         this.quoteStyle = quoteStyle;
 
         this.startOnNewLine = startOnNewLine;
@@ -44,6 +47,7 @@ export class DocstringFactory {
             this.includeName,
             this.includeDescription,
             this.includeVariadicArgs,
+            this.nameReturnValues,
         );
 
         // A template saved with Windows line endings would leave "\r" on blank lines, which then

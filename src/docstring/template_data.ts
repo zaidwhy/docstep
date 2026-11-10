@@ -17,6 +17,7 @@ export class TemplateData {
     public kwargs: KeywordArgument[];
     public starArgs: Argument[];
     public starKwargs: Argument[];
+    public namedReturns: Argument[];
     public exceptions: Exception[];
     public returns: Returns;
     public yields: Yields;
@@ -30,6 +31,7 @@ export class TemplateData {
         includeName: boolean,
         includeExtendedSummary: boolean,
         includeVariadicArgs = false,
+        nameReturnValues = false,
     ) {
         this.name = docstringParts.name;
         this.decorators = docstringParts.decorators;
@@ -39,6 +41,7 @@ export class TemplateData {
         this.starKwargs = includeVariadicArgs ? (docstringParts.starKwargs ?? []) : [];
         this.exceptions = docstringParts.exceptions;
         this.returns = docstringParts.returns;
+        this.namedReturns = nameReturnValues ? (docstringParts.returns?.values ?? []) : [];
         this.yields = docstringParts.yields;
 
         this.includeName = includeName;
@@ -104,12 +107,21 @@ export class TemplateData {
         return this.returns !== undefined;
     }
 
+    public namedReturnsExist(): boolean {
+        return this.namedReturns.length > 0;
+    }
+
     public yieldsExist(): boolean {
         return this.yields != undefined;
     }
 
     private removeTypes(): void {
-        for (const arg of [...this.args, ...this.starArgs, ...this.starKwargs]) {
+        for (const arg of [
+            ...this.args,
+            ...this.starArgs,
+            ...this.starKwargs,
+            ...this.namedReturns,
+        ]) {
             arg.type = undefined;
         }
 
@@ -127,7 +139,12 @@ export class TemplateData {
     }
 
     private addDefaultTypePlaceholders(placeholder: string): void {
-        for (const arg of [...this.args, ...this.starArgs, ...this.starKwargs]) {
+        for (const arg of [
+            ...this.args,
+            ...this.starArgs,
+            ...this.starKwargs,
+            ...this.namedReturns,
+        ]) {
             if (arg.type === undefined) {
                 arg.type = placeholder;
             }

@@ -106,12 +106,63 @@ function parseKeywordArguments(parameters: string[]): KeywordArgument[] {
 
 function parseReturn(parameters: string[], body: string[]): Returns {
     const returnType = parseReturnFromDefinition(parameters);
+    const returns =
+        returnType == null || isIterator(returnType.type)
+            ? parseFromBody(body, /return /)
+            : returnType;
 
-    if (returnType == null || isIterator(returnType.type)) {
-        return parseFromBody(body, /return /);
+    const values = returns === undefined ? undefined : returnedNames(body, returns.type);
+    return values === undefined ? returns : { ...returns, values };
+}
+
+/**
+ * The names of a tuple returned as plain names (`return mean, spread`), when every return
+ * statement in the body returns those same names; any other return makes the names a guess.
+ * Each name takes its type from a `tuple[...]` annotation with one element per name.
+ */
+function returnedNames(body: string[], annotation: string | undefined): Argument[] | undefined {
+    const statements = body.filter((line) => /^\s*return\b/.test(line));
+    const tuples = statements.map((line) =>
+        line.match(/^\s*return\s+\(?\s*(\w+(?:\s*,\s*\w+)+)\s*,?\s*\)?\s*(?:#.*)?$/),
+    );
+    if (statements.length === 0 || tuples.some((match) => match == null)) {
+        return undefined;
     }
 
-    return returnType;
+    const names = tuples[0][1].split(",").map((name) => name.trim());
+    if (tuples.some((match) => match[1].replace(/\s/g, "") !== names.join(","))) {
+        return undefined;
+    }
+
+    const types = tupleElementTypes(annotation);
+    return names.map((name, index) => ({
+        var: name,
+        type: types?.length === names.length ? types[index] : undefined,
+    }));
+}
+
+/** `tuple[int, str]` or `Tuple[int, str]` split into its element types, nested brackets kept whole. */
+function tupleElementTypes(annotation: string | undefined): string[] | undefined {
+    const inner = annotation?.match(/^[Tt]uple\[(.*)\]$/)?.[1];
+    if (inner === undefined) {
+        return undefined;
+    }
+    const elements: string[] = [];
+    let depth = 0;
+    let start = 0;
+    for (let index = 0; index < inner.length; index++) {
+        const char = inner[index];
+        if (char === "[") {
+            depth++;
+        } else if (char === "]") {
+            depth--;
+        } else if (char === "," && depth === 0) {
+            elements.push(inner.slice(start, index).trim());
+            start = index + 1;
+        }
+    }
+    elements.push(inner.slice(start).trim());
+    return elements;
 }
 
 function parseYields(parameters: string[], body: string[]): Yields {

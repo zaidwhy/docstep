@@ -125,6 +125,11 @@
                     "default": false,
                     "description": "Document *args and **kwargs: Generate Docstring lists them, and Update Docstring adds them when missing"
                 },
+                "docstep.nameReturnValues": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "NumPy formats: a function that returns a tuple of names (return mean, spread) gets one Returns entry per name"
+                },
                 "docstep.detectRenames": {
                     "type": "boolean",
                     "default": true,
