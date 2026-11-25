@@ -1,5 +1,7 @@
 # Docstep
 
+<img src=".github/hero.webp" alt="A stack of handwritten pages with margin scribbles next to a fountain pen and a brass paperweight on a wooden desk by a window." width="100%">
+
 Docstep is a VS Code extension that generates Python docstrings from a function or class signature, in Google, NumPy, Sphinx, PEP 257, docBlockr, doxygen or a custom mustache template. It is a maintained fork of [autoDocstring](https://github.com/NilsJPWerner/autoDocstring) by Nils Werner, whose last release was 0.6.1 in February 2022. On top of upstream it fixes docstrings indented to the editor tab size instead of the function body ([#315](https://github.com/NilsJPWerner/autoDocstring/issues/315)), the ignored `generateDocstringOnEnter` setting ([#312](https://github.com/NilsJPWerner/autoDocstring/issues/312)), class docstrings that listed the base classes as arguments instead of the `__init__` parameters or dataclass fields, indented module docstrings, CRLF templates, and functions and classes with PEP 695 type parameters. It also adds an [Update Docstring](#updating-a-docstring) command that brings an existing docstring in line with a changed signature, the most requested autoDocstring feature. The full list is in the [CHANGELOG](CHANGELOG.md).
 
 ![Generating a docstring](images/demo.gif)
