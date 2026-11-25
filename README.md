@@ -6,7 +6,13 @@ Docstep is a VS Code extension that generates Python docstrings from a function 
 
 ## Install
 
-Docstep is not on the VS Code Marketplace or Open VSX yet. Build and install it from source:
+Docstep is on the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=zaidwhy.docstep) and on [Open VSX](https://open-vsx.org/extension/zaidwhy/docstep). Search for Docstep in the Extensions view, or run:
+
+```bash
+code --install-extension zaidwhy.docstep
+```
+
+To build it from source instead:
 
 ```bash
 git clone https://github.com/zaidwhy/docstep.git
